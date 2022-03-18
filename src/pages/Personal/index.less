@@ -1,0 +1,141 @@
+@import '../../global.less';
+
+.mainContainer {
+  display: flex;
+  width: 100%;
+  .leftContainer {
+    display: flex;
+    width: 20%; // 280px
+    flex-direction: column;
+    align-items: center;
+    img {
+      margin-top: 79px;
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+    }
+    p {
+      margin-top: 16px;
+      width: 180px;
+      .font-size-weight(24px,500);
+      color: @text-5;
+    }
+    .buttonContainer {
+      margin-top: 25px;
+      width: 180px;
+      button {
+        display: flex;
+        align-items: center;
+        width: 156px;
+        height: 40px;
+        border: 0px;
+        border-radius: @border-radius-base;
+        background-color: @fill-4;
+        .font-size-weight(16px,400);
+        color: @text-3;
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+    .dataContainer {
+      margin-top: 36px;
+      width: 188px;
+      padding: 15px;
+      border-radius: 10px;
+      background-color: @fill-1;
+      ul {
+        li {
+          margin-bottom: 17px;
+          .font-size-weight(16px,400);
+          word-break: break-all;
+          color: @text-5;
+        }
+      }
+    }
+    .menuList {
+      margin-top: 59px;
+      width: 188px;
+      ul {
+        width: 100%;
+        background-color: @fill-1;
+        li {
+          display: flex;
+          align-items: center;
+          margin: 0px;
+          .font-size-weight(14px,400);
+          color: @text-5;
+          svg {
+            width: 14px;
+            height: 14px;
+          }
+          :global {
+            .ant-menu-title-content {
+              width: 100%;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .rightContainer {
+    display: flex;
+    flex-direction: column;
+    width: 1093px;
+    .CalendarContainer {
+      margin-top: 40px;
+      padding: 30px;
+      height: 291px;
+      background-color: @fill-1;
+      .CalendarTitle {
+        margin-bottom: 12px;
+        .font-size-weight(20px,400);
+      }
+    }
+    .chartContainer {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 41px;
+      .chartOne {
+        width: 360px;
+        height: 310px;
+        background-color: @fill-1;
+      }
+      .chartTwo {
+        width: 360px;
+        height: 310px;
+        background-color: @fill-1;
+      }
+      .chartThree {
+        width: 192px;
+        height: 110px;
+        background-color: @fill-1;
+      }
+      :global {
+        .ant-card-body {
+          padding-top: 10px;
+          padding-bottom: 0px;
+        }
+        .ant-card-body p:nth-of-type(n) {
+          color: @text-3;
+        }
+        .ant-card-body p:nth-of-type(1) {
+          margin-top: 16px;
+          margin-bottom: 8px;
+          .font-size-weight(16px,400);
+          color: @text-5;
+        }
+      }
+    }
+    .menuContainer {
+      margin: 30px 0;
+      height: 500px;
+      background-color: @fill-1;
+    }
+  }
+}

@@ -24,6 +24,7 @@
     "react/jsx-uses-react": "off",
     "react/react-in-jsx-scope": "off",
     "react-hooks/rules-of-hooks": "error", // 检查 Hook 的规则
-    "react-hooks/exhaustive-deps": "warn" // 检查 effect 的依赖
+    "react-hooks/exhaustive-deps": "warn", // 检查 effect 的依赖
+    "react/jsx-curly-brace-presence": "off" //强制使用大括号或禁止使用没必要的括号
   }
 }

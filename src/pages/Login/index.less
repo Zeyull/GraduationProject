@@ -1,0 +1,112 @@
+@import '../../global.less';
+
+.ant-form-item {
+  margin-bottom: 24px;
+  .ant-form-item-control-input-content {
+    display: flex;
+    justify-content: space-between;
+    button {
+      width: 133px;
+      height: 32px;
+    }
+  }
+}
+
+.mainContainer {
+  background-color: @fill-1;
+  .iconBack {
+    height: 76px;
+    width: 100%;
+    background-color: @cyan-2;
+    overflow: hidden;
+    img {
+      position: relative;
+      top: -46px;
+    }
+  }
+  .centerContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    padding-top: 50px;
+
+    width: 100%;
+    height: 635px;
+    background-color: @fill-1;
+    .text {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      width: 1136px;
+      height: 44px;
+      p {
+        .font-size-weight(36px,400);
+        color: @text-5;
+      }
+      .lineRow {
+        width: 500px;
+        height: 1px;
+        background-color: @line-3;
+      }
+    }
+    .main {
+      display: flex;
+      justify-content: space-between;
+
+      width: 80%;
+      .leftContainer {
+        width: 49%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        img {
+          height: 200px;
+          width: 200px;
+          border-radius: 50%;
+          background-color: @cyan-6;
+        }
+      }
+      .lineColumn {
+        margin-top: 40px;
+        width: 1px;
+        height: 500px;
+        background-color: @line-3;
+      }
+      .rightContainer {
+        width: 49%;
+        .menu {
+          margin-top: 49px;
+          margin-bottom: 53px;
+          margin-left: 110px;
+          border-bottom: 0px;
+          li {
+            text-align: center;
+            span {
+              .font-size-weight(14px,400);
+            }
+            height: 46px;
+          }
+        }
+        .menuContainer {
+          margin-left: 130px;
+          width: 320px;
+          .loginForm {
+            :global {
+              .ant-form-item();
+            }
+          }
+        }
+        .registerForm {
+          margin-top: 103px;
+          margin-left: 130px;
+          width: 320px;
+          :global {
+            .ant-form-item();
+          }
+        }
+      }
+    }
+  }
+}
