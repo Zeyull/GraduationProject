@@ -1,0 +1,122 @@
+@import '../../../../global.less';
+
+.mainContainer {
+  --bg-color-white: @fill-1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 21px 0;
+  .title {
+    margin-bottom: 13px;
+    .font-size-weight(24px,500);
+  }
+  .lineRow {
+    margin-bottom: 8px;
+    width: 140px;
+    height: 2px;
+    background-color: @black;
+  }
+  .subTitle {
+    color: @text-3;
+  }
+  .recordListOuter {
+    position: relative;
+    overflow: hidden;
+    transition: 0.25s;
+    width: 100%;
+    .recordList {
+      display: flex;
+      justify-content: flex-start;
+      white-space: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      direction: rtl;
+      .continueText {
+        direction: ltr;
+        padding-top: 40px;
+        margin-right: 50px;
+        width: 196px;
+        .font-size-weight(20px,500);
+        line-height: 48px;
+        color: @text-3;
+      }
+    }
+    .opacityMask {
+      position: absolute;
+      width: 150px;
+      height: 100%;
+      top: 0px;
+      user-select: none;
+    }
+    .opacityMaskL {
+      .opacityMask();
+      background-image: radial-gradient(
+        circle at 100% 50%,
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0) 50%,
+        var(--bg-color-white) 70%,
+        var(--bg-color-white)
+      );
+      left: 0;
+    }
+    .opacityMaskR {
+      .opacityMask();
+      background-image: radial-gradient(
+        circle at -10% 50%,
+        rgba(255, 255, 255, 0),
+        rgba(255, 255, 255, 0) 50%,
+        var(--bg-color-white) 70%,
+        var(--bg-color-white)
+      );
+      right: 0;
+    }
+  }
+}
+
+.itemContainer {
+  display: flex;
+  flex-direction: column;
+  padding: 40px 20px 20px 20px;
+  width: 189px;
+  height: 180px;
+  direction: ltr;
+  .itemTitle {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+    color: @text-3;
+    svg {
+      width: 36px;
+      height: 36px;
+    }
+    p {
+      .font-size-weight(20px,300);
+      margin-left: 10px;
+    }
+  }
+  .indexName {
+    margin-bottom: 15px;
+    .font-size-weight(20px,500);
+    color: @text-3;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .finished {
+    .font-size-weight(20px,500);
+    color: @success-6 !important;
+  }
+  .unFinished {
+    .font-size-weight(20px,500);
+    color: @warning-color !important;
+  }
+}
+
+.nowDate {
+  svg {
+    color: @text-5;
+  }
+  p {
+    color: @text-5 !important;
+  }
+}

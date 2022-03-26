@@ -1,3 +1,6 @@
+import moment from 'moment';
+import * as _ from 'lodash';
+moment.locale('zh-cn');
 const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const monthDaysLeap = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const monthName = [
@@ -14,15 +17,24 @@ const monthName = [
   'Nov',
   'Dec',
 ];
+export const dayName = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+export const dayNameCH = ['日', '一', '二', '三', '四', '五', '六'];
 
 // 函数getMonthRecent的返回值对象接口
-interface getMonthRecentRes {
+interface GetMonthRecentRes {
   year: number[]; // 年份数组
-  day: number; // 星期
-  date: number; // 日期
-  month: number; // 月份
+  day: number; // 当前星期
+  date: number; // 当前日期
+  month: number; // 当前月份
   monthDays: number[]; // 每月天数
   monthNames: string[]; // 每月名字缩写
+}
+
+interface OneDay {
+  year: number;
+  month: number; // [1,12]
+  date: number;
+  day: number; // [0,6] 周天为0，周六为6
 }
 
 /**
@@ -30,14 +42,14 @@ interface getMonthRecentRes {
  * @param n 查询的月份数
  * @returns 返回包含日期信息的对象
  */
-export function getMonthRecent(n = 12) {
+export function getMonthRecent(n = 12): GetMonthRecentRes {
   const date = new Date();
   const nowYear = date.getFullYear();
   const nowMonth = date.getMonth() + 1;
   const nowDay = date.getDay(); // 星期
   const nowDate = date.getDate(); // 日期
   const isLeapYear = isLeap(nowYear);
-  const res: getMonthRecentRes = {
+  const res: GetMonthRecentRes = {
     year: [],
     day: nowDay,
     date: nowDate,
@@ -85,4 +97,46 @@ export function isLeap(year: number) {
     return true;
   }
   return false;
+}
+
+/**
+ * 返回当前日期 待修改
+ * @type string
+ * L: "YYYY/MM/DD"
+ * year month date
+ * @returns
+ */
+export function getNowDate(type: string) {
+  const nowMoment = moment();
+  if (type === 'L') {
+    return nowMoment.format('L');
+  } else if (type === 'date') {
+    return nowMoment.date();
+  }
+}
+
+/**
+ * 当前月份每一天信息数组 待补充boolean
+ * @returns [{year,month,date,day}...]
+ */
+export function getNowMonthCalendar(): OneDay[] {
+  const nowMoment = moment();
+  const year = nowMoment.year();
+  const monthNumber = nowMoment.month(); // [0,11]
+  const monthString = _.padStart((nowMoment.month() + 1).toString(), 2, '0');
+  const days = isLeap(year)
+    ? monthDaysLeap[monthNumber]
+    : monthDays[monthNumber];
+  const res: OneDay[] = [];
+  for (let i = 1; i <= days; i++) {
+    res.push({
+      year,
+      month: monthNumber + 1,
+      date: i,
+      day: moment(
+        `${year}-${monthString}-${_.padStart(i.toString(), 2, '0')}`,
+      ).day(),
+    });
+  }
+  return res;
 }

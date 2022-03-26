@@ -1,4 +1,171 @@
+@import '../../global.less';
+
 .mainContainer {
-  height: 900px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding-left: 60px;
   background-color: @fill-3;
+  .pageContainer {
+    margin-top: 23px;
+    width: 1320px;
+    height: 226px;
+    border-radius: 10px;
+    background-color: @fill-1;
+  }
+  .dailyQuestionContainer {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 19px;
+    width: 1320px;
+    .dailyQuestion {
+      height: 295px;
+      width: 1056px;
+      border-radius: 10px;
+      background-color: @fill-1;
+    }
+    .recordContainer {
+      padding: 15px;
+      width: 240px;
+      height: 295px;
+      border-radius: 10px;
+      background-color: @fill-1;
+      .recordBool {
+        margin-top: 10px;
+        display: flex;
+        width: 60%;
+        p {
+          margin-right: 10px;
+          .font-size-weight(14px,500);
+        }
+        .success {
+          color: @success-color;
+        }
+        .error {
+          color: @text-3;
+        }
+      }
+      .recordKeep {
+        margin-top: 10px;
+        .font-size-weight(14px,400);
+        color: @text-3;
+      }
+    }
+  }
+  .listQuestionMenuSeach {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 18px;
+    width: 70%;
+
+    .listQuestionMenu {
+      border-radius: 10px;
+      li {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+    }
+    .listQuestionSearch {
+      width: 264px;
+      border-radius: @border-radius-base;
+      button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+  }
+  .listQuestionContainer {
+    margin-top: 18px;
+    width: 100%;
+    display: flex;
+    .listQuestionTable {
+      width: 70%;
+      :global {
+        .ant-table-thead {
+          .ant-table-cell::before {
+            width: 0px !important;
+          }
+        }
+        .ant-table-tbody {
+          .icon {
+            svg {
+              width: 20px;
+              height: 20px;
+            }
+          }
+        }
+      }
+    }
+    .rightOverflow {
+      margin-left: 3%;
+      .rightStickyContainer {
+        position: -webkit-sticky;
+        position: sticky;
+        top: 10%;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        .randomButton {
+          margin-top: 20px;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          .font-size-weight(18px,400);
+          svg {
+            width: 20px;
+            height: 20px;
+          }
+        }
+        :global {
+          .ant-card-body {
+            padding-top: 10px;
+            padding-bottom: 10px;
+          }
+          .ant-card-body p:nth-of-type(n) {
+            color: @text-3;
+          }
+          .ant-card-body p:nth-of-type(1) {
+            margin-top: 16px;
+            margin-bottom: 8px;
+            .font-size-weight(16px,400);
+            color: @text-5;
+          }
+        }
+      }
+    }
+    :global {
+      .ant-back-top {
+        right: 10px;
+        .backTopUp {
+          height: 40px;
+          width: 40px;
+          svg {
+            color: @cyan-7;
+            width: 40px;
+            height: 40px;
+          }
+        }
+      }
+    }
+  }
+  .listLoadButton {
+    margin: 20px 0 40px 30%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 0px;
+    color: @text-3;
+    .font-size-weight(14px,400);
+    svg {
+      width: 15px;
+      height: 15px;
+    }
+  }
 }

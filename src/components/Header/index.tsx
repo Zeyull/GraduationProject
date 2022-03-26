@@ -2,20 +2,33 @@ import { Input } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import styles from './index.less';
 import unloginImg from '@/assets/unLoginImg.png';
+import { history } from 'umi';
 
 export default function Header() {
   function onSearch() {
     console.log('onSearch');
   }
 
+  const goHomePage = () => {
+    history.push('/home');
+  };
+
+  const goLoginPage = () => {
+    history.push('/login');
+  };
+
+  const goPersonalPage = () => {
+    history.push('/personal');
+  };
+
   return (
     <header className={styles.headerContainer}>
       <div className={styles.leftHeaderContainer}>
         <ul>
-          <a href="#" className={styles.iconText}>
+          <a className={styles.iconText} onClick={goHomePage}>
             <li>欧客</li>
           </a>
-          <a href="#">
+          <a onClick={goPersonalPage}>
             <li>算法题目</li>
           </a>
           <a href="#">
@@ -38,7 +51,7 @@ export default function Header() {
             className={styles.searchInput}
           />
         </div>
-        <div className={styles.headImg}>
+        <div className={styles.headImg} onClick={goLoginPage}>
           <img src={unloginImg} />
         </div>
       </div>

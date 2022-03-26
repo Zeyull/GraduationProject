@@ -1,8 +1,8 @@
-import CalendarCard from './components/ClandarCard';
+import CalendarCard from './components/CalendarCard';
 import styles from './index.less';
 import unLoginImg from '@/assets/unLoginImg.png';
-import { Menu, Button, Card } from 'antd';
-import piePatternSrc from './piePatternSrc.js';
+import { Menu, Button } from 'antd';
+import PiePattern from './components/PiePattern';
 import Charts from '@/components/Echarts';
 import {
   EditOutlined,
@@ -85,48 +85,6 @@ export default function Personal() {
       ],
     },
   };
-  // 图三
-  const piePatternImg = new Image();
-  piePatternImg.src = piePatternSrc;
-  const optionChartsThree = {
-    width: '262px',
-    height: '110px',
-    options: {
-      series: [
-        {
-          name: 'pie',
-          type: 'pie',
-          selectedMode: 'single',
-          selectedOffset: 30,
-          clockwise: true,
-          label: {
-            fontSize: 14,
-            fontWeight: 500,
-            color: '#000',
-          },
-          labelLine: {
-            lineStyle: {
-              color: '#235894',
-            },
-          },
-          data: [
-            { value: 1048, name: '简单' },
-            { value: 735, name: '中等' },
-            { value: 580, name: '困难' },
-          ],
-          itemStyle: {
-            opacity: 0.7,
-            color: {
-              image: piePatternImg,
-              repeat: 'repeat',
-            },
-            borderWidth: 3,
-            borderColor: '#235894',
-          },
-        },
-      ],
-    },
-  };
 
   return (
     <div className={styles.mainContainer}>
@@ -145,9 +103,6 @@ export default function Personal() {
             </li>
             <li>
               <span>年龄：</span>&nbsp;<span>18</span>
-            </li>
-            <li>
-              <span>邮箱：</span>&nbsp;<span>834159744@qq.com</span>
             </li>
             <li>
               <span>个人简介：</span>&nbsp;<span>这个人很懒没有个人介绍</span>
@@ -186,7 +141,7 @@ export default function Personal() {
               key="setting"
               icon={<SettingOutlined style={{ color: '#1D2129' }} />}
             >
-              设置
+              个人资料
               <RightOutlined />
             </Menu.Item>
             <Menu.Item
@@ -210,15 +165,7 @@ export default function Personal() {
           <div className={styles.chartTwo}>
             <Charts option={optionChartsTwo} />
           </div>
-          <Card title="刷题总计" bordered={false} style={{ width: 310 }}>
-            <div className={styles.chartThree}>
-              <Charts option={optionChartsThree} />
-            </div>
-            <p>总题目： 43 / 1200</p>
-            <p>简单：1/ 200 </p>
-            <p>中等：32/500</p>
-            <p>困难：10/500</p>
-          </Card>
+          <PiePattern />
         </div>
         <div className={styles.menuContainer}>1</div>
       </div>

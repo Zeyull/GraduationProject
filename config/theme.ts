@@ -24,7 +24,9 @@ export default {
   '@success-3': '#7BE188', // 禁用
   '@success-4': '#009A29', // 点击
   '@success-5': '#23C343', // 悬浮
-  '@success-6': '#0FC6C2', // 常规
+  '@success-6': '#00B42A', // 常规
+
+  '@danger-7': '#CB2634', // 点击
 
   '@primary-color': '#0AA5A8', // 全局主色 cyan-7
   '@link-color': '#0FC6C2', // 链接色 cyan-6
