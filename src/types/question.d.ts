@@ -11,3 +11,16 @@ declare interface QuestionOption {
 declare interface DailyQuestionOption extends QuestionOption {
   date: string; // 日期
 }
+
+// 更详细的题目信息
+declare interface DetailQuestionOption extends QuestionOption {
+  allSubmission: number;
+  successSubmission: number;
+}
+
+declare interface QuestionSubmissionHistory {
+  result: boolean;
+  language: string;
+  submitTime: string; // YYYY/MM/DD TT:TT
+  consumeTime: number;
+}

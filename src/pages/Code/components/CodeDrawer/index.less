@@ -1,0 +1,54 @@
+@import '../../../../global.less';
+
+.mainContainer {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 30px;
+  width: 100%;
+  border-top: 0.5px solid @line-3;
+  background-color: @fill-1;
+  .font-size-weight(14px,400);
+  .leftContainer {
+    display: flex;
+    flex-direction: column;
+    width: 45%;
+    p {
+      margin-bottom: 5px;
+    }
+  }
+  .columnLine {
+    height: 160px;
+    width: 0.5px;
+    background-color: @line-3;
+  }
+  .rightContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    width: 45%;
+    height: 149px;
+    .runInput {
+      p {
+        margin-bottom: 5px;
+      }
+    }
+    .standardInput {
+      p {
+        margin-bottom: 5px;
+      }
+    }
+  }
+  .openIcon {
+    position: absolute;
+    top: 0%;
+    left: 50%;
+    transform: translate(-50%, -110%);
+    color: @cyan-7;
+    svg {
+      width: 30px;
+      height: 30px;
+    }
+  }
+}

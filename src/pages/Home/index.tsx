@@ -2,7 +2,7 @@ import styles from './index.less';
 import DailyQuestionList from './components/DailyQuestionList';
 import DailyCalendar from './components/DailyCalendar';
 import PiePattern from '../Personal/components/PiePattern';
-import { Menu, Input, Table, Tag, Button, BackTop } from 'antd';
+import { Menu, Input, Table, Button, BackTop } from 'antd';
 import type { ColumnType } from 'antd/lib/table';
 import {
   SettingOutlined,
@@ -16,6 +16,7 @@ import {
   UpCircleFilled,
 } from '@ant-design/icons';
 import { useState } from 'react';
+import LevelTag from '@/components/LevelTag';
 
 const { Search } = Input;
 
@@ -38,23 +39,7 @@ const columns: ColumnType<QuestionOption>[] = [
     dataIndex: 'level',
     sorter: (a, b) => Number(a.level) - Number(b.level),
     render: (_value: any, record: QuestionOption) => {
-      let text = '简单';
-      let color = 'green';
-      switch (record.level) {
-        case '1':
-          text = '简单';
-          color = 'green';
-          break;
-        case '2':
-          text = '中等';
-          color = 'blue';
-          break;
-        case '3':
-          text = '困难';
-          color = 'red';
-          break;
-      }
-      return <Tag color={color}>{text}</Tag>;
+      return <LevelTag level={record.level} />;
     },
   },
   {
@@ -82,7 +67,7 @@ const columns: ColumnType<QuestionOption>[] = [
       return record.state ? (
         <CheckSquareOutlined style={{ color: '#0FC6C2' }} />
       ) : (
-        <CloseSquareOutlined style={{ color: '#f5222d' }} />
+        <CloseSquareOutlined style={{ color: '#CB2634' }} />
       );
     },
   },

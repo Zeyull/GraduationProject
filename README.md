@@ -1,14 +1,16 @@
-# umi project
+# 基于Web的算法编程练习平台
 
-## Getting Started
+## 开始
 
-Install dependencies,
+打开终端，跳转至项目目录
+
+安装依赖
 
 ```bash
 $ yarn
 ```
 
-Start the dev server,
+在开发环境中运行前端项目
 
 ```bash
 $ yarn start

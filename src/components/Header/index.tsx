@@ -21,6 +21,10 @@ export default function Header() {
     history.push('/personal');
   };
 
+  const goCodePage = () => {
+    history.push('/code');
+  };
+
   return (
     <header className={styles.headerContainer}>
       <div className={styles.leftHeaderContainer}>
@@ -28,10 +32,10 @@ export default function Header() {
           <a className={styles.iconText} onClick={goHomePage}>
             <li>欧客</li>
           </a>
-          <a onClick={goPersonalPage}>
+          <a onClick={goCodePage}>
             <li>算法题目</li>
           </a>
-          <a href="#">
+          <a onClick={goPersonalPage}>
             <li>文章笔记</li>
           </a>
           <a href="#">
