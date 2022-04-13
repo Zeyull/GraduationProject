@@ -1,25 +1,36 @@
 import CalendarCard from './components/CalendarCard';
+import { useState, useRef } from 'react';
 import styles from './index.less';
 import unLoginImg from '@/assets/unLoginImg.png';
 import { Menu, Button } from 'antd';
 import PiePattern from './components/PiePattern';
+import PersonalData from './components/PersonalData';
+import MyArticle from './components/MyArticle';
+import SubmitTimeLine from './components/SubmitTimeLine';
 import Charts from '@/components/Echarts';
 import {
   EditOutlined,
   HistoryOutlined,
-  StarOutlined,
   SettingOutlined,
   LogoutOutlined,
   RightOutlined,
 } from '@ant-design/icons';
 
 export default function Personal() {
-  const handleClick = (e: any) => {
-    console.log('click', e);
+  const [menuKey, setMenuKey] = useState('note');
+  const [isChangeUserData, setIsChangeUserData] = useState(false);
+  const menuRef = useRef<HTMLInputElement>(null); // 如何解决null报错
+
+  const menuHandleClick = (e: any) => {
+    setMenuKey(e.key);
   };
 
-  const updatePersonalData = (e: any) => {
-    console.log('updatePersonalData', e);
+  // 编辑个人资料
+  const updatePersonalData = () => {
+    setIsChangeUserData(true);
+    if (menuRef.current) {
+      menuRef.current.scrollIntoView();
+    }
   };
 
   // 图一
@@ -85,6 +96,23 @@ export default function Personal() {
       ],
     },
   };
+  let MenuContent;
+  switch (menuKey) {
+    case 'note':
+      MenuContent = <MyArticle />;
+      break;
+    case 'history':
+      MenuContent = <SubmitTimeLine />;
+      break;
+    case 'setting':
+      MenuContent = (
+        <PersonalData
+          isChange={isChangeUserData}
+          changeFn={setIsChangeUserData}
+        />
+      );
+      break;
+  }
 
   return (
     <div className={styles.mainContainer}>
@@ -111,7 +139,7 @@ export default function Personal() {
         </div>
         <div className={styles.menuList}>
           <Menu
-            onClick={handleClick}
+            onClick={menuHandleClick}
             mode="vertical"
             defaultSelectedKeys={['note']}
             // selectedKeys={['note']}
@@ -130,13 +158,13 @@ export default function Personal() {
               刷题记录
               <RightOutlined />
             </Menu.Item>
-            <Menu.Item
+            {/* <Menu.Item
               key="start"
               icon={<StarOutlined style={{ color: '#F9CC45' }} />}
             >
               我的收藏
               <RightOutlined />
-            </Menu.Item>
+            </Menu.Item> */}
             <Menu.Item
               key="setting"
               icon={<SettingOutlined style={{ color: '#1D2129' }} />}
@@ -167,7 +195,9 @@ export default function Personal() {
           </div>
           <PiePattern />
         </div>
-        <div className={styles.menuContainer}>1</div>
+        <div className={styles.menuContainer} ref={menuRef}>
+          {MenuContent}
+        </div>
       </div>
     </div>
   );

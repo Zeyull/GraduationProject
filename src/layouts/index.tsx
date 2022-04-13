@@ -8,12 +8,17 @@ import { isFullCodePage } from '@/jotai';
 export default function IndexLayout(props: any) {
   const isFullPage = useAtom(isFullCodePage)[0];
   const path = history.location.pathname;
-  const isCodePage = path === '/code';
+  const showBottom =
+    path === '/code' ||
+    path === '/article-list' ||
+    path === '/article-content' ||
+    path === '/front-code' ||
+    path === '/create-article';
   return (
     <div className={styles.basicLayout}>
       {!isFullPage && <Header />}
       <div className={styles.container}>{props.children}</div>
-      {!isCodePage && <Footer />}
+      {!showBottom && <Footer />}
     </div>
   );
 }

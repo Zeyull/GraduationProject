@@ -1,3 +1,4 @@
+import * as _ from 'lodash';
 /**
  * 忽略自动提示的 token
  */
@@ -23,7 +24,7 @@ const codeIgnore = [
 export const codeIgnoreToken = (text: string[]) => {
   if (text !== [] && text[0]) {
     for (const pre in codeIgnore) {
-      if (codeIgnore[pre] === text[0]) {
+      if (_.trimStart(text[0], ' ') === codeIgnore[pre]) {
         return true;
       }
     }

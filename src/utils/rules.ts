@@ -39,3 +39,12 @@ export const usernameRules: Rule[] = [
     message: '用户名长度应为4-10位,只包含中英文- _符号',
   },
 ];
+
+export const phoneRules: Rule[] = [
+  { required: true, message: '请输入手机号' },
+  {
+    pattern:
+      /^((\+|00)86)?1((3[\d])|(4[5,6,7,9])|(5[0-3,5-9])|(6[5-7])|(7[0-8])|(8[\d])|(9[1,8,9]))\d{8}$/,
+    message: '请输入正确的手机号',
+  },
+];

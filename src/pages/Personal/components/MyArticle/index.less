@@ -1,0 +1,20 @@
+@import '../../../../global.less';
+
+.mainContainer {
+  padding: 20px;
+  .list {
+    :global {
+      .ant-list-item:hover {
+        background-color: @fill-3;
+      }
+      .ant-list-item-action {
+        position: relative;
+        bottom: 10px;
+      }
+      .ant-list-pagination {
+        margin: 0;
+        padding: 10px;
+      }
+    }
+  }
+}

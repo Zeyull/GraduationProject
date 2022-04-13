@@ -20,7 +20,10 @@ declare interface DetailQuestionOption extends QuestionOption {
 
 declare interface QuestionSubmissionHistory {
   result: boolean;
-  language: string;
+  language?: string;
   submitTime: string; // YYYY/MM/DD TT:TT
-  consumeTime: number;
+  consumeTime?: number;
+  questionIndex?: number;
+  questionName?: string;
+  questionLevel?: string;
 }

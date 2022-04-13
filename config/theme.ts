@@ -8,6 +8,7 @@ export default {
   '@text-1': '#FFFFFF', // 1 纯白文字
   '@text-2': '#C9CDD4', // 置灰信息
   '@text-3': '#86909C', // 次要信息
+  '@text-4': '#4E5969', // 次强调/正文标题
   '@text-5': '#1D2129', // 5-强调、正文标题
 
   '@line-3': '#C9CDD4', // 3-深、悬浮
@@ -20,6 +21,10 @@ export default {
   '@cyan-5': '#33D1C9', // 悬浮
   '@cyan-6': '#0FC6C2', // 常规
 
+  '@red-7': '#CC5120', // 性别女
+
+  '@blue-6': '#3491FA', // 性别男
+
   '@orange-6': '#F7BA1E', // 黄昏 6
 
   '@success-1': '#E8FFEA', // 浅色背景
@@ -27,9 +32,9 @@ export default {
   '@success-3': '#7BE188', // 禁用
   '@success-4': '#009A29', // 点击
   '@success-5': '#23C343', // 悬浮
-  '@success-6': '#00B42A', // 常规
+  '@success-6': '#00B42A', // 常规 题目正确
 
-  '@danger-7': '#CB2634', // 点击 失败 错误（颜色更暗一些）
+  '@danger-7': '#CB2634', // 点击 失败 错误（颜色更暗一些）题目失败
 
   '@primary-color': '#0AA5A8', // 全局主色 cyan-7
   '@link-color': '#0FC6C2', // 链接色 cyan-6
