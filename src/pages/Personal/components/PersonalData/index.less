@@ -1,0 +1,59 @@
+@import '../../../../global.less';
+
+.mainContainer {
+  padding: 40px;
+  padding-bottom: 60px;
+  width: 100%;
+  .font-size-weight(14px,400);
+  .title {
+    margin-bottom: 10px;
+    .font-size-weight(16px,700);
+  }
+  td {
+    padding-bottom: 20px;
+  }
+  .personalForm {
+    display: grid;
+    grid-template-columns: repeat(3, 33.33%);
+    grid-template-rows: repeat(4, 25%);
+    justify-items: start;
+    align-items: start;
+    grid-row-gap: 10px;
+    grid-template-areas:
+      'a b c'
+      'd e f'
+      'g g h'
+      'i j k';
+    width: 100%;
+    .maleRadio {
+      color: @blue-6;
+    }
+    .femaleRadio {
+      color: #ff0f0f;
+    }
+    .cancelButton {
+      margin-left: 20px;
+      border: 1px solid @line-3;
+    }
+    :global {
+      .ant-cascader {
+        .ant-select-arrow {
+          color: @line-3;
+        }
+      }
+      .ant-radio-wrapper {
+        div {
+          width: 100%;
+          height: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          svg {
+            width: 16px;
+            height: 16px;
+          }
+        }
+      }
+    }
+  }
+}

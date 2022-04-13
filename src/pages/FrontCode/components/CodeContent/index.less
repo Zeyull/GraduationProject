@@ -4,16 +4,11 @@
   width: 100%;
   height: 100%;
   overflow: auto;
+  padding: 10px 20px 20px 20px;
   .font-size-weight(14px,400);
-  .resultSuccess {
-    color: @success-6;
-  }
-  .resultError {
-    color: @danger-7;
-  }
-  tr {
-    th {
-      background-color: @fill-1;
+  :global {
+    .ant-collapse-content-box {
+      padding: 0px;
     }
   }
 }

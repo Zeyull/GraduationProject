@@ -25,6 +25,14 @@ export default function Header() {
     history.push('/code');
   };
 
+  const goArticlePage = () => {
+    history.push('/article-list');
+  };
+
+  const goFrontCoodePage = () => {
+    history.push('/front-code');
+  };
+
   return (
     <header className={styles.headerContainer}>
       <div className={styles.leftHeaderContainer}>
@@ -35,14 +43,14 @@ export default function Header() {
           <a onClick={goCodePage}>
             <li>算法题目</li>
           </a>
-          <a onClick={goPersonalPage}>
+          <a onClick={goArticlePage}>
             <li>文章笔记</li>
           </a>
-          <a href="#">
+          <a onClick={goFrontCoodePage}>
             <li>前端练习</li>
           </a>
-          <a href="#">
-            <li>题库</li>
+          <a onClick={goPersonalPage}>
+            <li>个人主页</li>
           </a>
         </ul>
       </div>

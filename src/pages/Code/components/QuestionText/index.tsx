@@ -4,7 +4,6 @@ import LevelTag from '@/components/LevelTag';
 
 export default function QuestionText(props: { questionMd: string }) {
   const { questionMd } = props;
-  document.documentElement.setAttribute('data-color-mode', 'light');
   const questionInfo: DetailQuestionOption = {
     id: '682',
     index: 682,

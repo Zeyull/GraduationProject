@@ -5,3 +5,6 @@ message.config({
   duration: 2,
   maxCount: 3,
 });
+
+// 设置markdown主题色
+document.documentElement.setAttribute('data-color-mode', 'light');

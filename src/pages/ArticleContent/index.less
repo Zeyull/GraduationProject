@@ -1,0 +1,104 @@
+@import '../../global.less';
+
+.mainContainer {
+  display: flex;
+  padding: 40px 80px;
+  .leftContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-right: 50px;
+    width: 20%;
+    .messageContainer {
+      padding: 20px;
+      display: flex;
+      align-items: center;
+      background-color: @fill-1;
+      border-radius: @border-radius-base;
+      .headImg {
+        margin-right: 20px;
+      }
+      .textContainer {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        .userName {
+          .font-size-weight(14px,500);
+        }
+        .releaseTime {
+          .font-size-weight(14px,300);
+          color: @text-3;
+        }
+      }
+    }
+    .tagsContainer {
+      display: flex;
+      flex-wrap: wrap;
+      justify-self: center;
+      align-items: center;
+      margin: 20px 0;
+      padding: 20px 0px 10px 20px;
+      background-color: @fill-1;
+      border-radius: @border-radius-base;
+      span {
+        margin-bottom: 8px;
+      }
+      .text {
+        margin-right: 8px;
+        .font-size-weight(14px,400);
+      }
+      :global {
+        .ant-tag {
+          margin-right: 4px;
+          background: @fill-3;
+          border: 0.5px solid @line-3;
+          color: @text-4;
+        }
+      }
+    }
+    .otherButtons {
+      position: sticky;
+      top: 30%;
+      display: flex;
+      flex-direction: column;
+      margin-top: 20px;
+      width: 50px;
+      :global {
+        .ant-btn {
+          margin-bottom: 30px;
+          height: 50px;
+          svg {
+            height: 30px;
+            width: 30px;
+          }
+        }
+      }
+      .unClick {
+        svg {
+          color: @text-3;
+        }
+      }
+    }
+  }
+  .rightContainer {
+    padding: 20px;
+    width: 70%;
+    border-radius: @border-radius-base;
+    background-color: @fill-1;
+    .titleContainer {
+      .font-size-weight(32px,500);
+      line-height: 34px;
+    }
+    .rowLine {
+      width: 100%;
+      border-bottom: 0.5px solid @line-3;
+      height: 8px;
+      margin-bottom: 8px;
+    }
+    .articleContainer {
+      .articleText {
+        .font-size-weight(14px,400);
+      }
+    }
+  }
+}

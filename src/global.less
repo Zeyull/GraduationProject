@@ -4,6 +4,11 @@
 * {
   padding: 0px;
   margin: 0px;
+  box-sizing: border-box;
+}
+
+body {
+  background-color: @fill-3;
 }
 
 .font-size-weight(@size,@weight) {
@@ -17,9 +22,73 @@
 // regular 400
 // medium 500
 
+svg {
+  vertical-align: baseline;
+}
+
 :global {
-  .ant-message-custom-content {
-    display: flex;
-    align-items: center;
+  .ant-btn-primary {
+    text-shadow: none;
+    box-shadow: none;
+  }
+  .react-codemirror2 {
+    height: 200px;
+    .CodeMirror {
+      height: 100%;
+      .CodeMirror-foldmarker {
+        font-size: 0px;
+      }
+      .CodeMirror-foldmarker::after {
+        content: '...';
+        font-size: 20px;
+        color: @text-5;
+        text-shadow: none;
+      }
+      .CodeMirror-foldgutter-open::after {
+        content: '\02C7';
+        position: relative;
+        left: -4px;
+        font-size: 20px;
+        opacity: 0.2;
+      }
+      .CodeMirror-foldgutter-open:hover::after {
+        opacity: 1;
+      }
+      .CodeMirror-foldgutter-folded::after {
+        content: '\203A';
+        position: relative;
+        left: -4px;
+        top: -6px;
+        font-size: 20px;
+        opacity: 0.2;
+      }
+      .CodeMirror-foldgutter-folded:hover::after {
+        opacity: 1;
+      }
+      .CodeMirror-gutters {
+        background-color: @fill-1;
+        .CodeMirror-foldgutter {
+          margin-left: 3px;
+        }
+      }
+      // 选择行的背景颜色
+      .CodeMirror-activeline-background {
+        background-color: rgba(@cyan-6, 0.1);
+      }
+      // 选择括号的颜色
+      .CodeMirror-matchingbracket {
+        color: @cyan-6;
+      }
+      // 框选文本时背景颜色
+      .CodeMirror-selected {
+        background-color: rgba(@cyan-6, 0.3);
+      }
+    }
+    // mdn-like 侧边颜色
+    .cm-s-mdn-like {
+      .CodeMirror-gutters {
+        border-left-color: @cyan-7;
+      }
+    }
   }
 }

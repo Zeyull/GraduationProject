@@ -16,7 +16,7 @@
           display: flex;
           justify-content: center;
           align-items: center;
-          width: 33.33%;
+          width: 49%;
         }
       }
     }
@@ -30,44 +30,16 @@
     }
   }
   .rightContainer {
-    position: relative;
     display: flex;
     flex-direction: column;
     width: 49.5%;
     background-color: @fill-1;
-    overflow: hidden;
     .codeOptions {
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       padding: 10px 20px;
       height: 45.5px;
       border-bottom: 0.5px solid @line-3;
-      .languageOptions {
-        display: flex;
-        align-items: center;
-        .languageSelect {
-          color: @text-5;
-          .font-size-weight(14px,400);
-          :global {
-            .ant-select-arrow {
-              color: @text-5;
-            }
-          }
-        }
-        .popoverText {
-          display: flex;
-          align-items: center;
-          cursor: pointer;
-          .greenCircle {
-            margin-left: 10px;
-            margin-right: 5px;
-            width: 8px;
-            height: 8px;
-            border-radius: 50%;
-            background-color: @success-6;
-          }
-        }
-      }
       .otherOptions {
         p {
           .font-size-weight(14px,400);
@@ -81,12 +53,22 @@
         }
       }
     }
-    .codeContainer {
+    .frontContainer {
       height: 100%;
+      margin: 10px;
+      padding: 5px;
       overflow: auto;
+      border: 1px solid @line-3;
+      :global {
+        .defaultText {
+          user-select: none;
+          .font-size-weight(14px,400);
+          color: @text-3;
+        }
+      }
     }
+
     .codeButton {
-      position: relative;
       display: flex;
       flex-direction: row-reverse;
       padding: 10px 20px;
@@ -96,18 +78,6 @@
       .submit {
         margin-left: 20px;
         border: 0px;
-      }
-      .test {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        color: @text-1;
-        background-color: @orange-6;
-        border: 0px;
-        svg {
-          width: 15px;
-          height: 15px;
-        }
       }
     }
   }

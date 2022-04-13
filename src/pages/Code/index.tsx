@@ -1,5 +1,5 @@
 import styles from './index.less';
-import { Menu, Select, Popover, Button, Tooltip, message } from 'antd';
+import { Menu, Select, Popover, Button, Tooltip } from 'antd';
 import {
   FileTextOutlined,
   HighlightOutlined,
@@ -14,20 +14,19 @@ import questionMD from './questionMD.js';
 import { useState } from 'react';
 import QuestionText from './components/QuestionText';
 import SubmissionHistory from './components/SubmissionHistory';
+import SolutionsComments from './components/SolutionsComments';
 import CodeDrawer from './components/CodeDrawer';
 import { useAtom } from 'jotai';
 import { isFullCodePage } from '@/jotai';
-import { codeIgnoreToken } from '@/utils/ignore';
+import { codemirrorOnchange, getCodeMirrorOptions } from '@/utils/codeOptionFn';
 import { defaultCodeContextFn, codeMirrorModeFn } from '@/utils/defaultCode';
 // codemirror 基础文件
 import { UnControlled as ReactCodeMirror } from 'react-codemirror2';
-import type { EditorConfiguration } from 'codemirror';
 import 'codemirror/lib/codemirror.css';
 import 'codemirror/lib/codemirror.js';
 // codemirror 主题样式
 import 'codemirror/theme/monokai.css';
 import 'codemirror/theme/mdn-like.css';
-
 // 代码补全
 import 'codemirror/addon/hint/show-hint.css';
 import 'codemirror/addon/hint/show-hint.js';
@@ -50,6 +49,9 @@ import 'codemirror/mode/xml/xml.js';
 import 'codemirror/mode/python/python.js';
 import 'codemirror/mode/perl/perl.js';
 import 'codemirror/mode/clike/clike.js';
+// 代码校验
+import 'codemirror/addon/lint/lint.js'; // 错误校验
+import 'codemirror/addon/lint/lint.css'; // 错误校验
 
 // import request from '@/utils/request';
 
@@ -72,7 +74,7 @@ export default function Code() {
         setMenuComponent(<QuestionText questionMd={questionMD} />);
         break;
       case 'solutions':
-        setMenuComponent(<QuestionText questionMd={questionMD} />);
+        setMenuComponent(<SolutionsComments />);
         break;
       case 'history':
         setMenuComponent(<SubmissionHistory />);
@@ -104,32 +106,6 @@ export default function Code() {
       </p>
     </div>
   );
-
-  const codeMirrorOptions: EditorConfiguration = {
-    lineNumbers: true,
-    mode: codeMirrorMode,
-    theme: 'mdn-like',
-    extraKeys: {
-      'Ctrl-S': function () {
-        message.success('已自动保存');
-      },
-      'Cmd-S': function () {
-        message.success('已自动保存');
-      },
-    }, // 自动提示配置
-    autofocus: true,
-    matchBrackets: true,
-    autoCloseBrackets: true,
-    lineWrapping: true,
-    tabSize: 4, // tab 宽度
-    indentUnit: 4, // 缩进单位
-    styleActiveLine: true,
-    foldGutter: true,
-    gutters: ['CodeMirror-linenumbers', 'CodeMirror-foldgutter'],
-    hintOptions: {
-      completeSingle: false,
-    },
-  };
 
   return (
     <div
@@ -200,16 +176,8 @@ export default function Code() {
         <div className={styles.codeContainer}>
           <ReactCodeMirror
             value={defaultCodeContext}
-            options={codeMirrorOptions}
-            onChange={(editor, data, _value) => {
-              if (data.origin === '+input') {
-                if (!codeIgnoreToken(data.text)) {
-                  setTimeout(() => {
-                    editor.execCommand('autocomplete');
-                  }, 20);
-                }
-              }
-            }}
+            options={getCodeMirrorOptions(codeMirrorMode)}
+            onChange={codemirrorOnchange}
           />
         </div>
         <CodeDrawer />
