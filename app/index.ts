@@ -10,12 +10,15 @@ import koaBody  from 'koa-body';
 import koaStatic from 'koa-static'
 import path from 'path';
 const app = new Koa;
+// 全局验证码Map
+export const captchaMap = new Map<string, string | null>();
 
 app
 .use(koaBody({
     multipart:true,
     formidable: {
-        maxFieldsSize: 200 * 1024 * 1024 // 设置文件大小最多2MB
+        maxFieldsSize: 500 * 1024 * 1024, // 设置文件大小最多5MB
+        hashAlgorithm:'md5'
     }
 }))
 .use(koaStatic(path.join(__dirname, '..','statics')))

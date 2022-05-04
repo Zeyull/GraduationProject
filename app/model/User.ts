@@ -2,7 +2,7 @@ import { Model, Table, Column, } from 'sequelize-typescript';
 @Table
 export default class User extends Model {
     @Column({primaryKey: true})
-    uuid!:string
+    uuid!:number
     @Column
     user_name!:string
     @Column

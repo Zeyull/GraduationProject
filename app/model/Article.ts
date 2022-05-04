@@ -2,7 +2,7 @@ import { Model, Table, Column, } from 'sequelize-typescript';
 @Table
 export default class Article extends Model {
     @Column({primaryKey: true})
-    article_id!:string
+    article_id!:number
     @Column
     article_title!:string
     @Column

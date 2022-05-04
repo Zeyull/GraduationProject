@@ -24,6 +24,9 @@ const config = {
     jwt:{
         jwt_secret: process.env.JWT_SECRET,
         jwt_expire: process.env.JWT_EXPIRES,
+    },
+    hash:{
+        salt: process.env.HASH_SALT,
     }
 }
 export default config;
