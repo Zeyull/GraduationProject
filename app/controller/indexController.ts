@@ -38,7 +38,7 @@ class IndexController{
             const res = await sendCodeMail(data.email,captcha);
             if(res.code === 200){
                 addCaptcha(data.email,captcha);
-                return response.success(ctx,{},'验证码已发送',200);
+                return response.success(ctx,{},'验证码已发送,五分钟后过期',200);
             }
         }catch(err){
             return response.error(ctx,'验证码发送失败，请检查邮箱是否正确或稍后重试',{},400);

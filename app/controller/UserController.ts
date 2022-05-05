@@ -6,7 +6,7 @@ import response from '../../utils/response';
 import UserService from '../service/UserService';
 import validate from '../../utils/validate';
 import { Rules } from "async-validator";
-import {emailRules, usernameRules,phoneRules,sexRules,cityRules,introductionRules,uuidRules}from '../../utils/rules';
+import {emailRules, usernameRules,phoneRules,sexRules,cityRules,introductionRules,uuidRules,ageRules}from '../../utils/rules';
 /**
  * UserController
  * @class
@@ -14,7 +14,7 @@ import {emailRules, usernameRules,phoneRules,sexRules,cityRules,introductionRule
 class UserController{
     /**
      * Get 获取用户信息
-     * @param {string} email 邮箱
+     * @param {string} uuid 用户ID
      */
     async getUserInfo(ctx: Context){
         const data = ctx.request.query;
@@ -48,7 +48,7 @@ class UserController{
         const rules:Rules = {
             uuid:uuidRules,
             user_name:usernameRules,
-            phone:phoneRules,
+            age:ageRules,
             email:emailRules,
             sex:sexRules,
             city:cityRules,
@@ -57,7 +57,7 @@ class UserController{
         interface IUser{
             uuid:number,
             user_name:string,
-            phone:string,
+            age:number,
             email:string,
             sex:number,
             city:string,

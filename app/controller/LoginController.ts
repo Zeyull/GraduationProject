@@ -88,7 +88,9 @@ class LoginController{
         if(createUser === null){
             return response.error(ctx,'用户创建失败',{},400);
         }else{
-            return response.success(ctx,{},'用户创建成功',200);
+            const user = await UserService.getUserByEmail(data.email);
+            const token = sign(user);
+            return response.success(ctx,{token,userInfo:user},'用户创建成功',200);
         }
     }
 
@@ -129,7 +131,9 @@ class LoginController{
             // 密码校验
             const rules:Rules = {
                 email:emailRules,
-                password:passwordRules,
+                password:[
+                    { type:'string', required: true, message: '密码不能为空' },
+                ],
                 type:typeRules
             }
             interface IUser{

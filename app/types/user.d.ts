@@ -1,6 +1,6 @@
 export interface userInfo{
     user_name:string,
-    phone:string,
+    age:number,
     email:string,
     sex:number,
     city:string,

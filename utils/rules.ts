@@ -91,3 +91,8 @@ export const uuidRules:RuleItem[] = [
 export const typeRules:RuleItem[] = [
   { type:'number',required: true, message: '登录类型不能为空' },
 ]
+
+export const ageRules:RuleItem[] = [
+  { required: true, message: '请输入年龄' },
+  { pattern: /^([1-9]\d?|100)$/,message:'年龄范围设置在1-100'}
+]

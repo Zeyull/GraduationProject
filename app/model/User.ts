@@ -8,6 +8,8 @@ export default class User extends Model {
     @Column
     password!:string
     @Column
+    age!:number
+    @Column
     email!:string
     @Column
     sex!:number
