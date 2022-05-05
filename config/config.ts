@@ -4,7 +4,6 @@ import routes from './routes';
 import theme from './theme';
 
 const { REACT_APP_ENV } = process.env;
-
 export default defineConfig({
   hash: true,
   nodeModulesTransform: {

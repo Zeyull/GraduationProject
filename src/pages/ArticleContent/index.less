@@ -81,23 +81,47 @@
     }
   }
   .rightContainer {
-    padding: 20px;
     width: 70%;
     border-radius: @border-radius-base;
-    background-color: @fill-1;
-    .titleContainer {
-      .font-size-weight(32px,500);
-      line-height: 34px;
-    }
-    .rowLine {
+    .bg {
       width: 100%;
-      border-bottom: 0.5px solid @line-3;
-      height: 8px;
-      margin-bottom: 8px;
+      padding: 30px;
+      background-color: @fill-1;
+      .titleContainer {
+        .font-size-weight(32px,500);
+        line-height: 34px;
+      }
+      .rowLine {
+        width: 100%;
+        border-bottom: 0.5px solid @line-3;
+        height: 8px;
+        margin-bottom: 8px;
+      }
+      .articleContainer {
+        .articleText {
+          .font-size-weight(14px,400);
+        }
+      }
     }
-    .articleContainer {
-      .articleText {
-        .font-size-weight(14px,400);
+    .commentContainer {
+      margin-top: 20px;
+      padding: 30px;
+      padding-top: 10px;
+      background-color: @fill-1;
+      .comments {
+        max-height: 600px;
+        :global {
+          .ant-comment {
+            border-bottom: 0.5px solid @line-3;
+          }
+          .replySpan {
+            color: @primary-7;
+            .font-size-weight(14px,400);
+          }
+        }
+      }
+      .replyBox {
+        margin-top: 20px;
       }
     }
   }

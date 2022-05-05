@@ -2,6 +2,8 @@ import piePatternSrc from './piePatternSrc.js';
 import styles from './index.less';
 import { Card } from 'antd';
 import Charts from '@/components/Echarts';
+import { LockOutlined } from '@ant-design/icons';
+import { useAuth } from '@/utils/auth';
 // 图三
 const piePatternImg = new Image();
 piePatternImg.src = piePatternSrc;
@@ -46,6 +48,7 @@ const optionChartsThree = {
 };
 
 export default function PiePattern() {
+  const { isLogin } = useAuth();
   return (
     <Card title="刷题总计" bordered={false} style={{ width: 310 }}>
       <div className={styles.chartThree}>
@@ -55,6 +58,15 @@ export default function PiePattern() {
       <p>简单：1/ 200 </p>
       <p>中等：32/500</p>
       <p>困难：10/500</p>
+      <div
+        className={styles.unLoginMask}
+        style={{ display: isLogin ? 'none' : 'inline' }}
+      >
+        <div className={styles.unLoginLock}>
+          <LockOutlined />
+          <p>请登录后查看</p>
+        </div>
+      </div>
     </Card>
   );
 }

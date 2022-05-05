@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "start": "umi dev",
-    "start:dev": "cross-env REACT_APP_ENV=dev MOCK=none UMI_ENV=dev umi dev",
+    "start:dev": "cross-env UMI_ENV=dev umi dev",
     "build": "umi build",
     "postinstall": "umi generate tmp",
     "eslint": "eslint . --ext .ts,.tsx,.js,.jsx",

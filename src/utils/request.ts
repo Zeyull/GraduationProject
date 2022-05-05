@@ -45,15 +45,21 @@ const request = extend({
 /**
  * request请求前拦截器
  */
-// request.interceptors.request.use((url: string, options: RequestOptionsInit) => {
-//   const token = 'XXXXXX';
-//   const headers = {
-//     Authorization: `Bearer ${token}`,
-//   };
-//   return {
-//     url,
-//     options: { ...options, headers },
-//   };
-// });
+request.interceptors.request.use((url: string, options: RequestOptionsInit) => {
+  const token = localStorage.getItem('token');
+  if (token !== null) {
+    const headers = {
+      Authorization: `Bearer ${token}`,
+    };
+    return {
+      url,
+      options: { ...options, headers },
+    };
+  }
+  return {
+    url,
+    options: { ...options },
+  };
+});
 
 export default request;

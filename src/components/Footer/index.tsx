@@ -1,25 +1,23 @@
 import styles from './index.less';
+import logo from '@/assets/logo.png';
 import { QqOutlined, GithubOutlined } from '@ant-design/icons';
 
 export default function Footer() {
   return (
     <footer className={styles.footerContainer}>
       <div className={styles.leftFooterContainer}>
-        <img />
+        <img src={logo} alt={'logo'} />
         <QqOutlined />
         <GithubOutlined />
       </div>
       <div className={styles.rightFooterContainer}>
         <div>
           <ul>
-            <a href="#">
-              <li>联系我们</li>
+            <a href="https://github.com/Zeyull" target="_Blank">
+              <li>联系我</li>
             </a>
-            <a href="#">
-              <li>常见问题</li>
-            </a>
-            <a href="#">
-              <li>关于我们</li>
+            <a href="https://github.com/Zeyull" target="_Blank">
+              <li>关于我</li>
             </a>
           </ul>
         </div>

@@ -6,7 +6,7 @@ import { Menu, Input, Table, Button, BackTop } from 'antd';
 import type { ColumnType } from 'antd/lib/table';
 import {
   SettingOutlined,
-  HighlightOutlined,
+  // HighlightOutlined,
   FireOutlined,
   CloseCircleOutlined,
   CheckSquareOutlined,
@@ -14,9 +14,11 @@ import {
   RightCircleOutlined,
   RetweetOutlined,
   UpCircleFilled,
+  LockOutlined,
 } from '@ant-design/icons';
 import { useState } from 'react';
 import LevelTag from '@/components/LevelTag';
+import { useAuth } from '@/utils/auth';
 
 const { Search } = Input;
 
@@ -167,6 +169,7 @@ const data: QuestionOption[] = [
 ];
 
 export default function Home() {
+  const { isLogin } = useAuth();
   const [tableData, setTableData] = useState(data);
   const [currentKey, setCurrentKey] = useState('all');
   const keepDays = 31;
@@ -200,6 +203,15 @@ export default function Home() {
             )}
           </div>
           <p className={styles.recordKeep}>已连续打卡{keepDays}天</p>
+          <div
+            className={styles.unLoginMask}
+            style={{ display: isLogin ? 'none' : 'inline' }}
+          >
+            <div className={styles.unLoginLock}>
+              <LockOutlined />
+              <p>请登录后查看</p>
+            </div>
+          </div>
         </div>
       </div>
       <div className={styles.listQuestionMenuSeach}>
@@ -212,9 +224,9 @@ export default function Home() {
           <Menu.Item key="all" icon={<SettingOutlined />}>
             全部题目
           </Menu.Item>
-          <Menu.Item key="front" icon={<HighlightOutlined />}>
+          {/* <Menu.Item key="front" icon={<HighlightOutlined />}>
             前端练习
-          </Menu.Item>
+          </Menu.Item> */}
           <Menu.Item key="Incomplete" icon={<CloseCircleOutlined />}>
             未完成
           </Menu.Item>

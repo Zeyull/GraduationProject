@@ -1,8 +1,7 @@
 import CalendarCard from './components/CalendarCard';
 import { useState, useRef } from 'react';
 import styles from './index.less';
-import unLoginImg from '@/assets/unLoginImg.png';
-import { Menu, Button } from 'antd';
+import { Menu, Button, Avatar, Upload, message, Modal, Image } from 'antd';
 import PiePattern from './components/PiePattern';
 import PersonalData from './components/PersonalData';
 import MyArticle from './components/MyArticle';
@@ -15,12 +14,96 @@ import {
   LogoutOutlined,
   RightOutlined,
 } from '@ant-design/icons';
+import { userInfoAtom } from '@/jotai';
+import { useAtom } from 'jotai';
+import request from '@/utils/request';
+import { clearLocalStorage } from '@/utils/dataHandle';
+import { history } from 'umi';
+
+function getBase64(img: any, callback: Function) {
+  const reader = new FileReader();
+  reader.addEventListener('load', () => callback(reader.result));
+  reader.readAsDataURL(img);
+}
+// 图片文件上传前进行处理
+function beforeUpload(file: any) {
+  const isJpgOrPng =
+    file.type === 'image/jpeg' ||
+    file.type === 'image/png' ||
+    file.type === 'image/jpg';
+  if (!isJpgOrPng) {
+    message.error('只能上传JPG/PNG/JPEG格式的图片');
+  }
+  const isLt5M = file.size / 1024 / 1024 < 5;
+  if (!isLt5M) {
+    message.error('文件大小不能超过5Mb');
+  }
+  return isJpgOrPng && isLt5M;
+}
 
 export default function Personal() {
+  const [isHeaderImgModalVisible, setIsHeaderImgModalVisible] = useState(false);
+  const [imgLoading, setImgLoading] = useState(false);
+  const [headImgFile, setHeadImgFile] = useState(null);
+  const [imgUrl, setImgUrl] = useState('');
+  // 获取用户信息
+  const [userInfo, setUserInfo] = useAtom(userInfoAtom);
+  const head_img = userInfo.head_img;
+  // @ts-ignore
+  const headerUrl = process.env.BASE_URL + head_img;
+
   const [menuKey, setMenuKey] = useState('note');
   const [isChangeUserData, setIsChangeUserData] = useState(false);
   const menuRef = useRef<HTMLInputElement>(null); // 如何解决null报错
 
+  // 图片状态改变回调
+  function imgHandleChange(info: any) {
+    setHeadImgFile(info.file.originFileObj);
+    if (info.file.status === 'uploading') {
+      getBase64(info.file.originFileObj, (imageUrl: any) => {
+        setImgUrl(imageUrl);
+      });
+      return;
+    }
+  }
+  // 自定义文件上传
+  async function uploadHeaderImage() {
+    const dataForm = new FormData();
+    dataForm.append('uuid', userInfo.uuid?.toString() as string);
+    dataForm.append('file', headImgFile as unknown as Blob);
+    // 开始等待
+    setImgLoading(true);
+    const res = await request.post('/uploadHeaderImage', {
+      requestType: 'form',
+      headers: { 'Content-Type': 'multipart/form-data' },
+      data: dataForm,
+    });
+    if (res.code === 200) {
+      message.success(res.msg);
+      setUserInfo({ ...userInfo, head_img: res.data.url });
+      setIsHeaderImgModalVisible(false);
+      setImgUrl('');
+      setHeadImgFile(null);
+    } else if (res.code >= 400) {
+      message.error(res.msg);
+    }
+    setImgLoading(false);
+  }
+
+  // 关闭修改框
+  const handleCancel = () => {
+    setIsHeaderImgModalVisible(false);
+    setImgUrl('');
+    setHeadImgFile(null);
+  };
+  // 弹出头像修改框
+  function handleAvatar(e: any) {
+    if (e.target.nodeName === 'IMG') {
+      setIsHeaderImgModalVisible(true);
+    }
+  }
+
+  // 选择菜单容器
   const menuHandleClick = (e: any) => {
     setMenuKey(e.key);
   };
@@ -28,6 +111,7 @@ export default function Personal() {
   // 编辑个人资料
   const updatePersonalData = () => {
     setIsChangeUserData(true);
+    setMenuKey('setting');
     if (menuRef.current) {
       menuRef.current.scrollIntoView();
     }
@@ -96,6 +180,7 @@ export default function Personal() {
       ],
     },
   };
+
   let MenuContent;
   switch (menuKey) {
     case 'note':
@@ -109,16 +194,25 @@ export default function Personal() {
         <PersonalData
           isChange={isChangeUserData}
           changeFn={setIsChangeUserData}
+          userInfo={userInfo}
+          setUserInfo={setUserInfo}
         />
       );
+      break;
+    case 'out':
+      clearLocalStorage();
+      history.push('/home');
+      location.reload();
       break;
   }
 
   return (
     <div className={styles.mainContainer}>
       <div className={styles.leftContainer}>
-        <img src={unLoginImg} />
-        <p>落雪如衣</p>
+        <div className={styles.avatarContainer} onClick={handleAvatar}>
+          <Avatar src={headerUrl} />
+        </div>
+        <p>{userInfo.user_name}</p>
         <div className={styles.buttonContainer}>
           <Button onClick={updatePersonalData} icon={<EditOutlined />}>
             编辑个人资料
@@ -127,13 +221,14 @@ export default function Personal() {
         <div className={styles.dataContainer}>
           <ul>
             <li>
-              <span>性别：</span>&nbsp;<span>男</span>
+              <span>性别：</span>&nbsp;
+              <span>{userInfo.sex === 1 ? '男' : '女'}</span>
             </li>
             <li>
-              <span>年龄：</span>&nbsp;<span>18</span>
+              <span>年龄：</span>&nbsp;<span>{userInfo.age}</span>
             </li>
             <li>
-              <span>个人简介：</span>&nbsp;<span>这个人很懒没有个人介绍</span>
+              <span>个人简介：</span>&nbsp;<span>{userInfo.introduction}</span>
             </li>
           </ul>
         </div>
@@ -142,7 +237,6 @@ export default function Personal() {
             onClick={menuHandleClick}
             mode="vertical"
             defaultSelectedKeys={['note']}
-            // selectedKeys={['note']}
           >
             <Menu.Item
               key="note"
@@ -158,13 +252,6 @@ export default function Personal() {
               刷题记录
               <RightOutlined />
             </Menu.Item>
-            {/* <Menu.Item
-              key="start"
-              icon={<StarOutlined style={{ color: '#F9CC45' }} />}
-            >
-              我的收藏
-              <RightOutlined />
-            </Menu.Item> */}
             <Menu.Item
               key="setting"
               icon={<SettingOutlined style={{ color: '#1D2129' }} />}
@@ -199,6 +286,43 @@ export default function Personal() {
           {MenuContent}
         </div>
       </div>
+      <Modal
+        title="修改头像"
+        visible={isHeaderImgModalVisible}
+        className={styles.headerImgModal}
+        width={300}
+        onCancel={handleCancel}
+        maskClosable={false}
+        footer={[
+          <Button onClick={handleCancel} key={'cancel'}>
+            取消
+          </Button>,
+          <Upload
+            key={'upload'}
+            onChange={imgHandleChange}
+            beforeUpload={beforeUpload}
+            showUploadList={false}
+          >
+            <Button type="primary" loading={imgLoading}>
+              上传图片
+            </Button>
+          </Upload>,
+          <Button
+            onClick={uploadHeaderImage}
+            key={'ok'}
+            type="primary"
+            loading={imgLoading}
+          >
+            确定
+          </Button>,
+        ]}
+      >
+        <Image
+          width={240}
+          height={240}
+          src={imgUrl === '' ? headerUrl : imgUrl}
+        />
+      </Modal>
     </div>
   );
 }

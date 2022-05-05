@@ -7,43 +7,56 @@
   .titleInput {
     margin-bottom: 10px;
   }
-  .tagsContainer {
+  .uploadImgTags {
     display: flex;
-    align-items: center;
-    margin-bottom: 10px;
-    .addTagInput {
-      display: flex;
-      align-items: center;
-      border-bottom: 1px solid @line-3;
-      margin-right: 10px;
-      :global {
-        button {
-          margin-right: 5px;
-        }
-        .ant-btn-dangerous {
-          background-color: transparent;
-        }
-      }
-    }
-    :global {
-      .ant-tag {
-        background-color: transparent;
-        color: @text-3;
-      }
-    }
-    .addTag {
-      cursor: pointer;
-      color: @cyan-7;
-      border-color: @cyan-7;
-      svg {
-        margin-right: 3px;
-      }
-    }
-    .text {
-      .font-size-weight(10px,400);
+    .uploadButton {
       color: @text-3;
     }
+    :global {
+      .ant-upload-picture-card-wrapper {
+        margin-left: 20px;
+      }
+    }
+    .tagsContainer {
+      display: flex;
+      align-items: flex-end;
+      margin-bottom: 10px;
+      .addTagInput {
+        display: flex;
+        align-items: center;
+        border-bottom: 1px solid @line-3;
+        margin-right: 10px;
+        :global {
+          button {
+            margin-right: 5px;
+          }
+          .ant-btn-dangerous {
+            background-color: transparent;
+          }
+        }
+      }
+      :global {
+        .ant-tag {
+          background-color: transparent;
+          color: @text-3;
+        }
+      }
+      .addTag {
+        cursor: pointer;
+        color: @cyan-7;
+        border-color: @cyan-7;
+        svg {
+          margin-right: 3px;
+        }
+      }
+      .text {
+        .font-size-weight(10px,400);
+        color: @text-3;
+        width: 120px;
+      }
+    }
   }
+
   :global {
     .rc-md-editor {
       margin-bottom: 20px;

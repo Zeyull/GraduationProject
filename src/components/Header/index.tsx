@@ -1,10 +1,15 @@
-import { Input } from 'antd';
+import { Input, Avatar } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 import styles from './index.less';
-import unloginImg from '@/assets/unLoginImg.png';
 import { history } from 'umi';
+import logo from '@/assets/logo.png';
+import { userInfoAtom } from '@/jotai';
+import { useAtom } from 'jotai';
 
 export default function Header() {
+  const [userInfo] = useAtom(userInfoAtom);
+  const head_img = userInfo.head_img || '/default/unLoginImg.png';
+  const headerUrl = process.env.BASE_URL + head_img;
   function onSearch() {
     console.log('onSearch');
   }
@@ -14,16 +19,20 @@ export default function Header() {
   };
 
   const goLoginPage = () => {
-    history.push('/login');
+    if (userInfo.uuid !== null) {
+      history.push('/personal');
+    } else {
+      history.push('/login');
+    }
   };
 
-  const goPersonalPage = () => {
-    history.push('/personal');
-  };
+  // const goPersonalPage = () => {
+  //   history.push('/personal');
+  // };
 
-  const goCodePage = () => {
-    history.push('/code');
-  };
+  // const goCodePage = () => {
+  //   history.push('/code');
+  // };
 
   const goArticlePage = () => {
     history.push('/article-list');
@@ -38,19 +47,14 @@ export default function Header() {
       <div className={styles.leftHeaderContainer}>
         <ul>
           <a className={styles.iconText} onClick={goHomePage}>
+            <img src={logo} alt="OK" />
             <li>欧客</li>
           </a>
-          <a onClick={goCodePage}>
-            <li>算法题目</li>
-          </a>
           <a onClick={goArticlePage}>
-            <li>文章笔记</li>
+            <li>博客笔记</li>
           </a>
           <a onClick={goFrontCoodePage}>
             <li>前端练习</li>
-          </a>
-          <a onClick={goPersonalPage}>
-            <li>个人主页</li>
           </a>
         </ul>
       </div>
@@ -64,7 +68,7 @@ export default function Header() {
           />
         </div>
         <div className={styles.headImg} onClick={goLoginPage}>
-          <img src={unloginImg} />
+          <Avatar size={48} src={headerUrl} />
         </div>
       </div>
     </header>

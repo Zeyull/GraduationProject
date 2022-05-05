@@ -48,3 +48,11 @@ export const phoneRules: Rule[] = [
     message: '请输入正确的手机号',
   },
 ];
+
+export const ageRules: Rule[] = [
+  { required: true, message: '请输入年龄' },
+  {
+    pattern: /^([1-9]\d?|100)$/,
+    message: '年龄范围在1-100',
+  },
+];

@@ -9,6 +9,7 @@ import {
   ExpandOutlined,
   CompressOutlined,
   ApiOutlined,
+  LockOutlined,
 } from '@ant-design/icons';
 import questionMD from './questionMD.js';
 import { useState } from 'react';
@@ -20,6 +21,7 @@ import { useAtom } from 'jotai';
 import { isFullCodePage } from '@/jotai';
 import { codemirrorOnchange, getCodeMirrorOptions } from '@/utils/codeOptionFn';
 import { defaultCodeContextFn, codeMirrorModeFn } from '@/utils/defaultCode';
+import { useAuth } from '@/utils/auth';
 // codemirror 基础文件
 import { UnControlled as ReactCodeMirror } from 'react-codemirror2';
 import 'codemirror/lib/codemirror.css';
@@ -58,6 +60,7 @@ import 'codemirror/addon/lint/lint.css'; // 错误校验
 const { Option } = Select;
 
 export default function Code() {
+  const { isLogin } = useAuth();
   const [menuComponent, setMenuComponent] = useState(
     <QuestionText questionMd={questionMD} />,
   );
@@ -188,6 +191,15 @@ export default function Code() {
           <Button className={styles.test} icon={<ApiOutlined />}>
             测试
           </Button>
+        </div>
+        <div
+          className={styles.unLoginMask}
+          style={{ display: isLogin ? 'none' : 'inline' }}
+        >
+          <div className={styles.unLoginLock}>
+            <LockOutlined />
+            <p>请登录后查看</p>
+          </div>
         </div>
       </div>
     </div>

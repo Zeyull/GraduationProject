@@ -5,6 +5,7 @@ import {
   CodeOutlined,
   ExpandOutlined,
   CompressOutlined,
+  LockOutlined,
 } from '@ant-design/icons';
 import { useState, useRef } from 'react';
 import { useAtom } from 'jotai';
@@ -12,8 +13,10 @@ import { isFullCodePage, htmlValue, cssValue, jsValue } from '@/jotai';
 import QuestionText from './components/QuestionText';
 import CodeContent from './components/CodeContent';
 import { getFrontPage } from '@/utils/defaultCode';
+import { useAuth } from '@/utils/auth';
 
 export default function FrontCode() {
+  const { isLogin } = useAuth();
   const [isFullPage, setIsCodeFullPage] = useAtom(isFullCodePage);
   const pageIfr = useRef(null);
   const [html] = useAtom(htmlValue);
@@ -87,6 +90,15 @@ export default function FrontCode() {
           >
             编译
           </Button>
+        </div>
+        <div
+          className={styles.unLoginMask}
+          style={{ display: isLogin ? 'none' : 'inline' }}
+        >
+          <div className={styles.unLoginLock}>
+            <LockOutlined />
+            <p>请登录后查看</p>
+          </div>
         </div>
       </div>
     </div>

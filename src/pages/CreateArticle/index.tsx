@@ -1,8 +1,12 @@
 import styles from './index.less';
 import MarkdownPreview from '@uiw/react-markdown-preview';
 import MdEditor from 'react-markdown-editor-lite';
-import { Input, Tag, Button, message } from 'antd';
-import { PlusOutlined, CloseOutlined } from '@ant-design/icons';
+import { Input, Tag, Button, message, Upload } from 'antd';
+import {
+  PlusOutlined,
+  CloseOutlined,
+  LoadingOutlined,
+} from '@ant-design/icons';
 // 导入编辑器的样式
 import 'react-markdown-editor-lite/lib/index.css';
 import { useState } from 'react';
@@ -83,6 +87,32 @@ export default function CreateArticle() {
     </div>
   );
 
+  const uploadButton = (
+    <div className={styles.uploadButton}>
+      {/* {loading ? <LoadingOutlined /> : <PlusOutlined />} */}
+      <PlusOutlined />
+      <div style={{ marginTop: 8 }}>上传封面</div>
+    </div>
+  );
+
+  function getBase64(img: any, callback: any) {
+    const reader = new FileReader();
+    reader.addEventListener('load', () => callback(reader.result));
+    reader.readAsDataURL(img);
+  }
+
+  function beforeUpload(file: any) {
+    const isJpgOrPng = file.type === 'image/jpeg' || file.type === 'image/png';
+    if (!isJpgOrPng) {
+      message.error('You can only upload JPG/PNG file!');
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error('Image must smaller than 2MB!');
+    }
+    return isJpgOrPng && isLt2M;
+  }
+
   return (
     <div className={styles.mainContainer}>
       <Input
@@ -91,30 +121,44 @@ export default function CreateArticle() {
         maxLength={20}
         showCount={true}
       />
-      <div className={styles.tagsContainer}>
-        {articleTags.map((item) => {
-          return (
-            <Tag
-              closable
-              onClose={(e) => {
-                e.preventDefault();
-                deleteTags(item.tagName);
-              }}
-              key={item.tagName}
-            >
-              {item.tagName}
+      <div className={styles.uploadImgTags}>
+        <div className={styles.tagsContainer}>
+          {articleTags.map((item) => {
+            return (
+              <Tag
+                closable
+                onClose={(e) => {
+                  e.preventDefault();
+                  deleteTags(item.tagName);
+                }}
+                key={item.tagName}
+              >
+                {item.tagName}
+              </Tag>
+            );
+          })}
+          {isAddTag && addTagInput}
+          {!isAddTag && maxTags <= 5 && (
+            <Tag onClick={showTagInput} className={styles.addTag}>
+              {' '}
+              <PlusOutlined />
+              加载更多
             </Tag>
-          );
-        })}
-        {isAddTag && addTagInput}
-        {!isAddTag && maxTags <= 5 && (
-          <Tag onClick={showTagInput} className={styles.addTag}>
-            {' '}
-            <PlusOutlined />
-            加载更多
-          </Tag>
-        )}
-        <p className={styles.text}>最多添加五个标签哦</p>
+          )}
+          <p className={styles.text}>最多添加五个标签哦</p>
+        </div>
+        <Upload
+          name="avatar"
+          listType="picture-card"
+          className="avatar-uploader"
+          showUploadList={false}
+          action="https://www.mocky.io/v2/5cc8019d300000980a055e76"
+          beforeUpload={beforeUpload}
+          // onChange={this.handleChange}
+        >
+          {/* {imageUrl ? <img src={imageUrl} alt="avatar" style={{ width: '100%' }} /> : uploadButton} */}
+          {uploadButton}
+        </Upload>
       </div>
       <MdEditor
         style={{ height: '600px' }}

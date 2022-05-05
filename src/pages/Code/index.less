@@ -84,6 +84,11 @@
     .codeContainer {
       height: 100%;
       overflow: auto;
+      :global {
+        .react-codemirror2 {
+          height: 100%;
+        }
+      }
     }
     .codeButton {
       position: relative;
@@ -108,6 +113,51 @@
           width: 15px;
           height: 15px;
         }
+      }
+    }
+    .unLoginMask {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      backdrop-filter: blur(6px);
+      .unLoginLock {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-20px, -20px);
+        svg {
+          width: 40px;
+          height: 40px;
+          font-weight: 600;
+          color: @black;
+        }
+        p {
+          position: absolute;
+          width: 100px;
+          top: 100%;
+          transform: translate(-20px);
+          .font-size-weight(14px,400);
+        }
+      }
+      .unLoginLock::after {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 40%;
+        left: 110%;
+        width: 120px;
+        border: 1px solid @black;
+      }
+      .unLoginLock::before {
+        content: '';
+        display: block;
+        position: absolute;
+        top: 40%;
+        right: 110%;
+        width: 120px;
+        border: 1px solid @black;
       }
     }
   }
