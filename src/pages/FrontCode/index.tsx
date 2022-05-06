@@ -1,5 +1,5 @@
 import styles from './index.less';
-import { Menu, Button } from 'antd';
+import { Menu, Button, message } from 'antd';
 import {
   FileTextOutlined,
   CodeOutlined,
@@ -7,15 +7,30 @@ import {
   CompressOutlined,
   LockOutlined,
 } from '@ant-design/icons';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { useAtom } from 'jotai';
 import { isFullCodePage, htmlValue, cssValue, jsValue } from '@/jotai';
 import QuestionText from './components/QuestionText';
 import CodeContent from './components/CodeContent';
 import { getFrontPage } from '@/utils/defaultCode';
 import { useAuth } from '@/utils/auth';
+import request from '@/utils/request';
 
 export default function FrontCode() {
+  const [questionData, SetQuestionData] = useState<FrontQuestion[]>([]);
+  useEffect(() => {
+    const res = new Promise((resolve, _reject) => {
+      resolve(request.get('/getAllFrontQuestion'));
+    });
+    res.then((response: any) => {
+      if (response.code >= 400) {
+        message.error(response.msg);
+      } else if (response.code === 200) {
+        SetQuestionData(response.data.frontQuestion);
+      }
+    });
+  }, []);
+
   const { isLogin } = useAuth();
   const [isFullPage, setIsCodeFullPage] = useAtom(isFullCodePage);
   const pageIfr = useRef(null);
@@ -26,15 +41,15 @@ export default function FrontCode() {
     setIsCodeFullPage((pre) => !pre);
   };
   //
-  const [menuComponent, setMenuComponent] = useState(<QuestionText />);
+  const [menuComponent, setMenuComponent] = useState('text');
   //  菜单点击
   const menuClick = (e: any) => {
     switch (e.keyPath[0]) {
       case 'text':
-        setMenuComponent(<QuestionText />);
+        setMenuComponent('text');
         break;
       case 'code':
-        setMenuComponent(<CodeContent />);
+        setMenuComponent('code');
         break;
     }
   };
@@ -63,7 +78,13 @@ export default function FrontCode() {
             在线编程
           </Menu.Item>
         </Menu>
-        <div className={styles.menuContainer}>{menuComponent}</div>
+        <div className={styles.menuContainer}>
+          {menuComponent === 'text' ? (
+            <QuestionText questionData={questionData} />
+          ) : (
+            <CodeContent />
+          )}
+        </div>
         <div className={styles.bottomLine} />
         <div className={styles.bottomLine} />
       </div>

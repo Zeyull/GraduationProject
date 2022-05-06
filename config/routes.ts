@@ -15,7 +15,7 @@ export default [
       { path: '/code', component: './Code', title: 'xxx题' },
       { path: '/article-list', component: './ArticleList', title: '文章笔记' },
       {
-        path: '/article-content',
+        path: '/article-content/:id',
         component: './ArticleContent',
         title: 'xxx文章',
       },

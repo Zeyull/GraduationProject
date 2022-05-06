@@ -7,4 +7,5 @@ declare interface UserInfo {
   sex: number;
   user_name: string;
   age: number;
+  password?: string;
 }

@@ -27,3 +27,9 @@ declare interface QuestionSubmissionHistory {
   questionName?: string;
   questionLevel?: string;
 }
+
+declare interface FrontQuestion {
+  fquestion_id: number;
+  question_name: string;
+  question_content: string;
+}

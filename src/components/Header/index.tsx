@@ -8,7 +8,7 @@ import { useAtom } from 'jotai';
 
 export default function Header() {
   const [userInfo] = useAtom(userInfoAtom);
-  const head_img = userInfo.head_img || '/default/unLoginImg.png';
+  const head_img = userInfo.head_img;
   const headerUrl = process.env.BASE_URL + head_img;
   function onSearch() {
     console.log('onSearch');

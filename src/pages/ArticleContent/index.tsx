@@ -1,24 +1,23 @@
 import styles from './index.less';
-import { Avatar, Tag, Button, Comment, Tooltip, List, Input, Form } from 'antd';
 import {
-  UserOutlined,
-  RollbackOutlined,
-  LikeFilled,
-  MessageFilled,
-} from '@ant-design/icons';
-import { useState, useRef } from 'react';
+  Avatar,
+  Tag,
+  Button,
+  Comment,
+  Tooltip,
+  List,
+  Input,
+  Form,
+  message,
+} from 'antd';
+import { RollbackOutlined, LikeFilled, MessageFilled } from '@ant-design/icons';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import MarkdownPreview from '@uiw/react-markdown-preview';
-import articleMD from './articleMD.js';
 import moment from 'moment';
+import request from '@/utils/request';
 
 const { TextArea } = Input;
 
-const articleTags: ArticleTags[] = [];
-for (let i = 0; i < 7; i++) {
-  articleTags.push({
-    tagName: 'text',
-  });
-}
 // 评论数据
 const data = [
   {
@@ -46,7 +45,7 @@ const data = [
   },
   {
     actions: [
-      <span key="comment-list-reply-to-0" className="replySpan">
+      <span key="comment-list-reply-to-1" className="replySpan">
         回复
       </span>,
     ],
@@ -91,7 +90,47 @@ const Editor = (props: { onSubmit: any; submitting: boolean }) => (
   </>
 );
 
-export default function ArticleContent() {
+export default function ArticleContent(props: any) {
+  const [article, SetArticle] = useState<ArticleType>();
+  const [author, SetAuthor] = useState<UserInfo>();
+  const [tags, SetTags] = useState<ArticleTags[]>();
+  const article_id = Number(props.match.params.id);
+
+  async function firstRequestFn() {
+    // 文章请求
+    const articeRes = await request.get('/getArticleByID', {
+      params: {
+        article_id: article_id,
+      },
+    });
+    const articleData = articeRes.data.article;
+    const tagsData = articeRes.data.tags;
+    if (articeRes.code >= 400) {
+      message.error(articeRes.msg);
+      return;
+    } else if (articeRes.code === 200) {
+      SetArticle(articleData);
+      SetTags(tagsData);
+    }
+    // 用户请求
+    const userRes = await request.get('/getUserInfo', {
+      params: {
+        uuid: articleData.author_id,
+      },
+    });
+    const userData = userRes.data.user;
+    if (userRes.code >= 400) {
+      message.error(userRes.msg);
+      return;
+    } else if (userRes.code === 200) {
+      SetAuthor(userData);
+    }
+  }
+  const firstRequestCBFn = useCallback(firstRequestFn, [article_id]);
+  useEffect(() => {
+    firstRequestCBFn();
+  }, [firstRequestCBFn]);
+
   const commentRef = useRef<HTMLInputElement>(null);
   const [likeState] = useState(false);
 
@@ -106,20 +145,32 @@ export default function ArticleContent() {
       <div className={styles.leftContainer}>
         <div className={styles.messageContainer}>
           <div className={styles.headImg}>
-            <Avatar size={64} icon={<UserOutlined />} />
+            <Avatar
+              size={64}
+              src={`${process.env.BASE_URL}${
+                author?.head_img || '/default/unLoginImg.png'
+              }`}
+            />
           </div>
           <div className={styles.textContainer}>
-            <p className={styles.userName}>落雪如衣</p>
-            <p className={styles.releaseTime}>发布时间:2022/04/04</p>
+            <p className={styles.userName}>{author?.user_name}</p>
+            <p className={styles.releaseTime}>
+              发布时间:{moment(article?.time).format('YYYY-MM-DD')}
+            </p>
           </div>
         </div>
         <div className={styles.tagsContainer}>
           <span className={styles.text}>文章标签:</span>
-          {articleTags.map((item) => {
-            return <Tag key={item.tagName}>{item.tagName}</Tag>;
+          {tags?.map((item) => {
+            return <Tag key={item.tags_id}>{item.tags_name}</Tag>;
           })}
         </div>
-        <Button block icon={<RollbackOutlined />} type="primary">
+        <Button
+          block
+          icon={<RollbackOutlined />}
+          type="primary"
+          style={{ display: article?.question_id ? 'block' : 'none' }}
+        >
           前往题目页面
         </Button>
         <div className={styles.otherButtons}>
@@ -143,13 +194,11 @@ export default function ArticleContent() {
       </div>
       <div className={styles.rightContainer}>
         <div className={styles.bg}>
-          <div className={styles.titleContainer}>
-            基于Web的算法编程练习平台系统的设计与实现
-          </div>
+          <div className={styles.titleContainer}>{article?.article_title}</div>
           <div className={styles.rowLine} />
           <div className={styles.articleContainer}>
             <MarkdownPreview
-              source={articleMD}
+              source={article?.article_content}
               className={styles.articleText}
             />
           </div>
