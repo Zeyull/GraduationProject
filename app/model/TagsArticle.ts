@@ -3,6 +3,6 @@ import { Model, Table, Column, } from 'sequelize-typescript';
 export default class Tags_Article extends Model {
     @Column({primaryKey: true})
     tags_id!:number
-    @Column
+    @Column({primaryKey: true})
     article_id!:number
 }

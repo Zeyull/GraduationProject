@@ -1,7 +1,7 @@
 import { Model, Table, Column, } from 'sequelize-typescript';
 @Table
 export default class Article extends Model {
-    @Column({primaryKey: true})
+    @Column({primaryKey: true,autoIncrement: true,})
     article_id!:number
     @Column
     article_title!:string
@@ -10,7 +10,7 @@ export default class Article extends Model {
     @Column
     time!:string
     @Column
-    author!:string
+    author_id!:number
     @Column
     like!:number
     @Column

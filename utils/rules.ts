@@ -96,3 +96,31 @@ export const ageRules:RuleItem[] = [
   { required: true, message: '请输入年龄' },
   { pattern: /^([1-9]\d?|100)$/,message:'年龄范围设置在1-100'}
 ]
+
+export const questionNameRules:RuleItem[] = [
+  {required:true, message: '题目名不能为空'},
+  { type:'string', pattern:/^.{4,10}$/,message: '题目长度为4到10位'}
+]
+
+export const questionContentRules:RuleItem[] = [
+  {required:true, message: '题目内容不能为空'},
+]
+
+export const articleTitleRules:RuleItem[] = [
+  {required:true, message: '文章标题不能为空'},
+  { type:'string', pattern:/^.{1,20}$/,message: '文章标题长度应该1到20位'},
+]
+
+export const timeRules:RuleItem[] = [
+  {required:true, message: '上传时间不能为空'},
+  { type:'string',message: 'time数据格式不对'},
+]
+
+export const articleContentRules:RuleItem[] = [
+  {required:true, message: '文章内容不能为空'},
+  { type:'string',message: 'article_content数据格式不对'},
+]
+
+export const authorIDRules:RuleItem[] = [
+  {required:true, message: '发布者不能为空'},
+]
