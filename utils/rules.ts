@@ -108,7 +108,7 @@ export const questionContentRules:RuleItem[] = [
 
 export const articleTitleRules:RuleItem[] = [
   {required:true, message: '文章标题不能为空'},
-  { type:'string', pattern:/^.{1,20}$/,message: '文章标题长度应该1到20位'},
+  { type:'string', pattern:/^.{1,50}$/,message: '文章标题长度应该1到50位'},
 ]
 
 export const timeRules:RuleItem[] = [
@@ -123,4 +123,8 @@ export const articleContentRules:RuleItem[] = [
 
 export const authorIDRules:RuleItem[] = [
   {required:true, message: '发布者不能为空'},
+]
+
+export const authorIMGRules:RuleItem[] = [
+  {required:true, message: '发布者信息错误（头像数据丢失）'},
 ]

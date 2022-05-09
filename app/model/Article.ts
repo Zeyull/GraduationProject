@@ -17,4 +17,6 @@ export default class Article extends Model {
     img!:string
     @Column
     question_id!:string
+    @Column
+    author_img!:string
 }

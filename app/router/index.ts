@@ -21,5 +21,10 @@ router.post('/createFrontQuestion',CodeController.createFrontQuestion);
 //article部分
 router.post('/createArticle',ArticleController.createArticle);
 router.get('/getArticleByID',ArticleController.getArticleByID);
+router.post('/getArticleLikeOrNot',ArticleController.getArticleLikeOrNot);
+router.post('/addComment',ArticleController.addComment);
+router.get('/getAllTags',ArticleController.getAllTags);
+router.get('/getAllArticle',ArticleController.getAllArticle);
+router.delete('/deleteArticle',ArticleController.deleteArticle);
 // router.use(AuthMiddleware)
 export default router;

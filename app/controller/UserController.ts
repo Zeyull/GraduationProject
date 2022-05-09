@@ -15,6 +15,7 @@ class UserController{
     /**
      * Get 获取用户信息
      * @param {string} uuid 用户ID
+     * @return {user} 用户信息
      */
     async getUserInfo(ctx: Context){
         const data = ctx.request.query;

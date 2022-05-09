@@ -13,6 +13,7 @@ export const sequelize = new Sequelize(config.db.db_name as string,config.db.db_
         freezeTableName: true,
     },
     models:[path.join(__dirname,'..','model/**/*.ts'),path.join(__dirname,'..','model/**/*.js')],
+    timezone: '+08:00',
 });
 
 const db = async ()=>{
