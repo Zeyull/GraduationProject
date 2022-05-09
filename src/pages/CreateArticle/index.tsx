@@ -5,7 +5,7 @@ import { Input, Tag, Button, message, Upload } from 'antd';
 import { PlusOutlined, CloseOutlined, DeleteOutlined } from '@ant-design/icons';
 // 导入编辑器的样式
 import 'react-markdown-editor-lite/lib/index.css';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import * as _ from 'lodash';
 import moment from 'moment';
 import { useAtom } from 'jotai';
@@ -74,7 +74,7 @@ export default function CreateArticle() {
         bordered={false}
         placeholder={'添加新标签'}
         showCount={true}
-        maxLength={7}
+        maxLength={12}
         value={inputValue}
         onChange={tagInputChange}
       />
@@ -163,6 +163,7 @@ export default function CreateArticle() {
     form.append('time', time);
     form.append('article_content', mdText);
     form.append('tags', tags);
+    form.append('author_img', userInfo.head_img);
     // @ts-ignore
     form.append('author_id', userInfo.uuid);
     // @ts-ignore
@@ -180,12 +181,24 @@ export default function CreateArticle() {
     }
   }
 
+  // 离开后保存草稿
+  //    useEffect(() => {
+  //     const listener = (ev:any) => {
+  //         ev.preventDefault();
+  //         ev.returnValue='文章要保存吼，确定离开吗？';
+  //     };
+  //     window.addEventListener('beforeunload', listener);
+  //     return () => {
+  //         window.removeEventListener('beforeunload', listener)
+  //     }
+  // }, []);
+
   return (
     <div className={styles.mainContainer}>
       <Input
         placeholder="请输入标题"
         className={styles.titleInput}
-        maxLength={20}
+        maxLength={50}
         showCount={true}
         value={titleText}
         onChange={titleTextChange}

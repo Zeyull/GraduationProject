@@ -20,7 +20,7 @@ export default function Header() {
 
   const goLoginPage = () => {
     if (userInfo.uuid !== null) {
-      history.push('/personal');
+      history.push(`/personal/${userInfo.uuid}`);
     } else {
       history.push('/login');
     }

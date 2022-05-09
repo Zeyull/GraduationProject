@@ -7,7 +7,7 @@ export default [
       { path: '/home', component: './Home', title: '首页' },
       { path: '/login', component: './Login', title: '登录' },
       {
-        path: '/personal',
+        path: '/personal/:id',
         component: './Personal',
         title: '个人中心',
         wrappers: ['@/wrappers/auth'],

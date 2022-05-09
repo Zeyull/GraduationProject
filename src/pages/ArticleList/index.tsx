@@ -5,85 +5,70 @@ import {
   EditOutlined,
   UpCircleFilled,
 } from '@ant-design/icons';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { OptionProps } from 'rc-mentions/lib/Option';
 import ArticleDataList from '@/components/ArticleDataList';
+import { history } from 'umi';
+import request from '@/utils/request';
+import { filterArticleFnAtom } from '@/jotai/articleList';
+import { useAtom } from 'jotai';
 
 const { Option } = Mentions;
 
-const tagsOption: ArticleTags[] = [
-  {
-    tagName: 'JavaScript',
-  },
-  {
-    tagName: 'Java',
-  },
-  {
-    tagName: 'C',
-  },
-  {
-    tagName: 'C++',
-  },
-  {
-    tagName: 'Python',
-  },
-  {
-    tagName: 'Go',
-  },
-  {
-    tagName: '前端',
-  },
-  {
-    tagName: '后端',
-  },
-  {
-    tagName: '面经',
-  },
-  {
-    tagName: 'React',
-  },
-  {
-    tagName: 'Vue',
-  },
-  {
-    tagName: 'Nodejs',
-  },
-];
-
 export default function ArticleList() {
+  const [filterArticleObj] = useAtom(filterArticleFnAtom);
   const [mentionValue, setMentionValue] = useState('');
   const [selectTagsArr, setSelectTagsArr] = useState<ArticleTags[]>([]);
-  const [tagsArr, setTagsArr] = useState<ArticleTags[]>(tagsOption);
+  const [tagsArr, setTagsArr] = useState<ArticleTags[]>([]);
+  const [originTags, setOriginTags] = useState<ArticleTags[]>([]);
   // 展示tag数目
   const [maxTagsNumber, setMaxTagsNumber] = useState(15);
+
+  useEffect(() => {
+    async function firstLoad() {
+      const tagsRes = await request.get('/getAllTags');
+      if (tagsRes.code === 200) {
+        setTagsArr(tagsRes.data.tags);
+        setOriginTags(tagsRes.data.tags);
+      } else if (tagsRes.code >= 400) {
+        message.error(tagsRes.msg);
+      }
+    }
+    firstLoad();
+  }, []);
+
   // 选择标签
   const selectTag = (e: any) => {
     let text = e.target.innerText as string;
-    let newArr = [{ tagName: text }, ...selectTagsArr];
+    let newArr = [{ tags_name: text }, ...selectTagsArr];
     setSelectTagsArr(newArr);
-    setTagsArr(tagsArr.filter((tag) => tag.tagName !== text));
+    setTagsArr(tagsArr.filter((tag) => tag.tags_name !== text));
+    filterArticleObj.filterArticleFn(newArr);
   };
+
   // 删除标签
-  const deleteTag = (tagName: string) => {
-    setSelectTagsArr(selectTagsArr.filter((tag) => tag.tagName !== tagName));
+  const deleteTag = (tags_name: string) => {
+    const newArr = selectTagsArr.filter((tag) => tag.tags_name !== tags_name);
+    setSelectTagsArr(newArr);
     setTagsArr(
-      tagsOption.filter((tag) => {
-        let tempTagName = tag.tagName;
-        if (tempTagName === tagName) {
+      originTags.filter((tag) => {
+        let temptags_name = tag.tags_name;
+        if (temptags_name === tags_name) {
           return true;
         }
         for (let item of selectTagsArr) {
-          if (tempTagName === item.tagName) {
+          if (temptags_name === item.tags_name) {
             return false;
           }
         }
         return true;
       }),
     );
+    filterArticleObj.filterArticleFn(newArr);
   };
   // 加载更多标签
   const addMoreTags = () => {
-    if (maxTagsNumber >= 50) {
+    if (maxTagsNumber >= 45) {
       message.error('请采用搜索方式查询标签');
     } else {
       setMaxTagsNumber((pre) => pre + 15);
@@ -106,7 +91,7 @@ export default function ArticleList() {
   };
   // 创作文章
   const createArticle = () => {
-    alert('创建文章');
+    history.push('/create-article');
   };
 
   return (
@@ -117,8 +102,8 @@ export default function ArticleList() {
             if (index === maxTagsNumber - 1) {
               return (
                 <>
-                  <Tag key={item.tagName} onClick={selectTag}>
-                    {item.tagName}
+                  <Tag key={item.tags_name} onClick={selectTag}>
+                    {item.tags_name}
                   </Tag>
                   <Tag
                     key={'add'}
@@ -131,8 +116,8 @@ export default function ArticleList() {
               );
             }
             return (
-              <Tag key={item.tagName} onClick={selectTag}>
-                {item.tagName}
+              <Tag key={item.tags_name} onClick={selectTag}>
+                {item.tags_name}
               </Tag>
             );
           })}
@@ -159,8 +144,8 @@ export default function ArticleList() {
           >
             {tagsArr.map((item) => {
               return (
-                <Option key={item.tagName} value={item.tagName}>
-                  {item.tagName}
+                <Option key={item.tags_name} value={item.tags_name}>
+                  {item.tags_name}
                 </Option>
               );
             })}
@@ -176,11 +161,11 @@ export default function ArticleList() {
                 closable
                 onClose={(e) => {
                   e.preventDefault();
-                  deleteTag(item.tagName);
+                  deleteTag(item.tags_name);
                 }}
-                key={item.tagName}
+                key={item.tags_name}
               >
-                {item.tagName}
+                {item.tags_name}
               </Tag>
             );
           })}

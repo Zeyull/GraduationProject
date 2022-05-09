@@ -111,8 +111,15 @@
       padding-top: 10px;
       background-color: @fill-1;
       .comments {
-        max-height: 600px;
+        overflow: auto;
+        max-height: 520px;
         :global {
+          .ant-list-header {
+            top: 0;
+            position: sticky;
+            background-color: @fill-1;
+            z-index: 1;
+          }
           .ant-comment {
             border-bottom: 0.5px solid @line-3;
           }
@@ -120,10 +127,73 @@
             color: @primary-7;
             .font-size-weight(14px,400);
           }
+          .ant-comment-nested {
+            width: 90%;
+            margin-bottom: 10px;
+            .ant-collapse-item {
+              border-bottom: 0;
+              .ant-collapse-header {
+                padding: 5px;
+                .font-size-weight(12px,400);
+                color: @text-3;
+              }
+            }
+          }
+        }
+        .replyName {
+          margin-left: 5px;
+          cursor: pointer;
+          color: @link-color;
         }
       }
       .replyBox {
+        position: relative;
         margin-top: 20px;
+        .unLoginMask {
+          position: absolute;
+          left: 0;
+          top: 0;
+          width: 100%;
+          height: 100%;
+          backdrop-filter: blur(6px);
+          .unLoginLock {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-20px, -20px);
+            svg {
+              width: 40px;
+              height: 40px;
+              font-weight: 600;
+              color: @black;
+            }
+            p {
+              position: absolute;
+              width: 100px;
+              top: 100%;
+              transform: translate(-20px);
+              .font-size-weight(14px,400);
+            }
+          }
+          .unLoginLock::after {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 40%;
+            left: 110%;
+            width: 120px;
+            border: 1px solid @black;
+          }
+          .unLoginLock::before {
+            content: '';
+            display: block;
+            position: absolute;
+            top: 40%;
+            right: 110%;
+            width: 120px;
+            border: 1px solid @black;
+          }
+        }
       }
     }
   }

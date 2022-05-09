@@ -4,10 +4,14 @@ declare interface ArticleTags {
 }
 // 文章粗略展现
 declare interface ArticleData {
-  href?: string;
+  id: number;
   title: string;
   avatar: string;
   content: string;
+  likes: number;
+  comments: number;
+  img: string | null;
+  tags: any;
 }
 
 declare interface ArticleType {
@@ -19,4 +23,17 @@ declare interface ArticleType {
   like: number;
   question_id: number | null;
   time: string;
+  author_img: string;
+}
+
+declare interface CommentType {
+  article_id?: number;
+  comment_id: number;
+  content: string;
+  reply_id: number;
+  reply_name: string;
+  time: string;
+  user_name: string;
+  head_img: string;
+  uuid: number;
 }

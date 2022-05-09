@@ -2,7 +2,7 @@ import styles from './index.less';
 import DailyQuestionList from './components/DailyQuestionList';
 import DailyCalendar from './components/DailyCalendar';
 import PiePattern from '../Personal/components/PiePattern';
-import { Menu, Input, Table, Button, BackTop } from 'antd';
+import { Menu, Input, Table, Button, BackTop, message } from 'antd';
 import type { ColumnType } from 'antd/lib/table';
 import {
   SettingOutlined,
@@ -175,7 +175,9 @@ export default function Home() {
   const keepDays = 31;
   const todayQuestionBoolean = true;
   const handleClick = (e: any) => {
-    console.log('click ', e);
+    if (!isLogin) {
+      return;
+    }
     setCurrentKey(e.key);
   };
   const onSearch = (value: string) => console.log(value);
@@ -183,6 +185,12 @@ export default function Home() {
   // 加载更多的题目
   const loadQuestion = () => {
     setTableData([...data, ...tableData]);
+  };
+
+  const clickSort = () => {
+    if (!isLogin) {
+      return message.error('请先登录');
+    }
   };
 
   return (
@@ -224,13 +232,14 @@ export default function Home() {
           <Menu.Item key="all" icon={<SettingOutlined />}>
             全部题目
           </Menu.Item>
-          {/* <Menu.Item key="front" icon={<HighlightOutlined />}>
-            前端练习
-          </Menu.Item> */}
-          <Menu.Item key="Incomplete" icon={<CloseCircleOutlined />}>
+          <Menu.Item
+            key="Incomplete"
+            icon={<CloseCircleOutlined />}
+            onClick={clickSort}
+          >
             未完成
           </Menu.Item>
-          <Menu.Item key="fire" icon={<FireOutlined />}>
+          <Menu.Item key="fire" icon={<FireOutlined />} onClick={clickSort}>
             大家都在做
           </Menu.Item>
         </Menu>

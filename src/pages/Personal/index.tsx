@@ -1,5 +1,5 @@
 import CalendarCard from './components/CalendarCard';
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import styles from './index.less';
 import { Menu, Button, Avatar, Upload, message, Modal, Image } from 'antd';
 import PiePattern from './components/PiePattern';
@@ -41,20 +41,55 @@ function beforeUpload(file: any) {
   return isJpgOrPng && isLt5M;
 }
 
-export default function Personal() {
+const defaultInfo: UserInfo = {
+  uuid: null,
+  head_img: '/default/unLoginImg.png',
+  city: '浙江/杭州',
+  email: '',
+  introduction: '这个人很懒，什么都没有写',
+  sex: 1,
+  user_name: '',
+  age: 18,
+};
+
+export default function Personal(props: any) {
+  const uuid = Number(props.match.params.id);
   const [isHeaderImgModalVisible, setIsHeaderImgModalVisible] = useState(false);
   const [imgLoading, setImgLoading] = useState(false);
   const [headImgFile, setHeadImgFile] = useState(null);
   const [imgUrl, setImgUrl] = useState('');
-  // 获取用户信息
+  // 获取本地用户信息
   const [userInfo, setUserInfo] = useAtom(userInfoAtom);
-  const head_img = userInfo.head_img;
+  const [requestUser, setRequestUser] = useState(defaultInfo);
+  const isUserSelf = uuid === userInfo.uuid;
+  const head_img = requestUser.head_img;
   // @ts-ignore
   const headerUrl = process.env.BASE_URL + head_img;
 
   const [menuKey, setMenuKey] = useState('note');
   const [isChangeUserData, setIsChangeUserData] = useState(false);
   const menuRef = useRef<HTMLInputElement>(null); // 如何解决null报错
+
+  useEffect(() => {
+    async function firstLoad() {
+      const userRes = await request.get('/getUserInfo', {
+        params: {
+          uuid,
+        },
+      });
+      if (userRes.code === 200) {
+        const data = userRes.data.user;
+        setRequestUser(data);
+      } else if (userRes.code >= 400) {
+        message.error(userRes.msg);
+      }
+    }
+    if (!isUserSelf) {
+      firstLoad();
+    } else {
+      setRequestUser(userInfo);
+    }
+  }, [uuid, userInfo.uuid, isUserSelf, userInfo]);
 
   // 图片状态改变回调
   function imgHandleChange(info: any) {
@@ -68,6 +103,9 @@ export default function Personal() {
   }
   // 自定义文件上传
   async function uploadHeaderImage() {
+    if (headImgFile === null) {
+      return handleCancel();
+    }
     const dataForm = new FormData();
     dataForm.append('uuid', userInfo.uuid?.toString() as string);
     dataForm.append('file', headImgFile as unknown as Blob);
@@ -184,7 +222,7 @@ export default function Personal() {
   let MenuContent;
   switch (menuKey) {
     case 'note':
-      MenuContent = <MyArticle />;
+      MenuContent = <MyArticle isUserSelf={isUserSelf} uuid={uuid} />;
       break;
     case 'history':
       MenuContent = <SubmitTimeLine />;
@@ -194,7 +232,7 @@ export default function Personal() {
         <PersonalData
           isChange={isChangeUserData}
           changeFn={setIsChangeUserData}
-          userInfo={userInfo}
+          userInfo={requestUser}
           setUserInfo={setUserInfo}
         />
       );
@@ -212,8 +250,11 @@ export default function Personal() {
         <div className={styles.avatarContainer} onClick={handleAvatar}>
           <Avatar src={headerUrl} />
         </div>
-        <p>{userInfo.user_name}</p>
-        <div className={styles.buttonContainer}>
+        <p>{requestUser.user_name}</p>
+        <div
+          className={styles.buttonContainer}
+          style={{ display: isUserSelf ? 'block' : 'none' }}
+        >
           <Button onClick={updatePersonalData} icon={<EditOutlined />}>
             编辑个人资料
           </Button>
@@ -222,13 +263,14 @@ export default function Personal() {
           <ul>
             <li>
               <span>性别：</span>&nbsp;
-              <span>{userInfo.sex === 1 ? '男' : '女'}</span>
+              <span>{requestUser.sex === 1 ? '男' : '女'}</span>
             </li>
             <li>
-              <span>年龄：</span>&nbsp;<span>{userInfo.age}</span>
+              <span>年龄：</span>&nbsp;<span>{requestUser.age}</span>
             </li>
             <li>
-              <span>个人简介：</span>&nbsp;<span>{userInfo.introduction}</span>
+              <span>个人简介：</span>&nbsp;
+              <span>{requestUser.introduction}</span>
             </li>
           </ul>
         </div>
@@ -242,7 +284,7 @@ export default function Personal() {
               key="note"
               icon={<EditOutlined style={{ color: '#3491FA' }} />}
             >
-              我的笔记
+              {isUserSelf ? '我的笔记' : '他的笔记'}
               <RightOutlined />
             </Menu.Item>
             <Menu.Item
@@ -262,6 +304,7 @@ export default function Personal() {
             <Menu.Item
               key="out"
               icon={<LogoutOutlined style={{ color: '#F53F3F' }} />}
+              style={{ display: isUserSelf ? 'flex' : 'none' }}
             >
               退出登录
             </Menu.Item>
@@ -287,35 +330,39 @@ export default function Personal() {
         </div>
       </div>
       <Modal
-        title="修改头像"
+        title={isUserSelf ? '修改头像' : '查看头像'}
         visible={isHeaderImgModalVisible}
         className={styles.headerImgModal}
         width={300}
         onCancel={handleCancel}
         maskClosable={false}
-        footer={[
-          <Button onClick={handleCancel} key={'cancel'}>
-            取消
-          </Button>,
-          <Upload
-            key={'upload'}
-            onChange={imgHandleChange}
-            beforeUpload={beforeUpload}
-            showUploadList={false}
-          >
-            <Button type="primary" loading={imgLoading}>
-              上传图片
-            </Button>
-          </Upload>,
-          <Button
-            onClick={uploadHeaderImage}
-            key={'ok'}
-            type="primary"
-            loading={imgLoading}
-          >
-            确定
-          </Button>,
-        ]}
+        footer={
+          isUserSelf
+            ? [
+                <Button onClick={handleCancel} key={'cancel'}>
+                  取消
+                </Button>,
+                <Upload
+                  key={'upload'}
+                  onChange={imgHandleChange}
+                  beforeUpload={beforeUpload}
+                  showUploadList={false}
+                >
+                  <Button type="primary" loading={imgLoading}>
+                    上传图片
+                  </Button>
+                </Upload>,
+                <Button
+                  onClick={uploadHeaderImage}
+                  key={'ok'}
+                  type="primary"
+                  loading={imgLoading}
+                >
+                  确定
+                </Button>,
+              ]
+            : []
+        }
       >
         <Image
           width={240}

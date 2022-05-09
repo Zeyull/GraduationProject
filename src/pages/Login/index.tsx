@@ -102,7 +102,6 @@ function LoginForm(props: {
       data.password = values.password;
       data.type = 1;
     }
-    console.log(data);
     const res = await request.post('/login', { data });
 
     if (res.code >= 400) {
