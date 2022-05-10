@@ -53,3 +53,71 @@ export function mdToNormalString(md: string) {
     return str.slice(0, 200);
   }
 }
+
+export function judgeReutrn(info: any) {
+  if (Object.keys(info).length === 0) {
+    return {
+      res: 'normal',
+      msg: '',
+    };
+  }
+  // WRONG_ANSWER = -1 (this means the process exited normally, but the answer is wrong)
+  // SUCCESS = 0 (this means the answer is accepted)
+  // CPU_TIME_LIMIT_EXCEEDED = 1
+  // REAL_TIME_LIMIT_EXCEEDED = 2
+  // MEMORY_LIMIT_EXCEEDED = 3
+  // RUNTIME_ERROR = 4
+  // SYSTEM_ERROR = 5
+  let status = '';
+  switch (info.result) {
+    case -1:
+      status = 'WRONG_ANSWER';
+      break;
+    case 0:
+      status = 'SUCCESS';
+      break;
+    case 1:
+      status = 'CPU_TIME_LIMIT_EXCEEDED';
+      break;
+    case 2:
+      status = 'REAL_TIME_LIMIT_EXCEEDED';
+      break;
+    case 3:
+      status = 'MEMORY_LIMIT_EXCEEDED';
+      break;
+    case 4:
+      status = 'RUNTIME_ERROR';
+      break;
+    case 5:
+      status = 'SYSTEM_ERROR';
+  }
+  if (info.result === 0) {
+    return {
+      res: true,
+      msg: `${status} 运行成功\n运行时间共${info.statistic_info.time_cost}ms 占用空间共${info.statistic_info.memory_cost}bit`,
+    };
+  } else {
+    const msgErr =
+      info.statistic_info.err_info === undefined
+        ? ''
+        : '，错误信息:' + info.statistic_info.err_info.replace(/\n/g, `\\n`);
+    return {
+      res: false,
+      msg: `${status} 失败\n${msgErr}`,
+    };
+  }
+  // can_unshare: true
+  // code: "var fn = function(params) {\n    //write code here\n};"
+  // contest: null
+  // create_time: "2022-05-10T05:00:36.218470Z"
+  // id: "7cfd4f8e643259962c939d7522e24934"
+  // info: {err: null, data: Array(1)}
+  // ip: "117.172.232.183"
+  // language: "JavaScript"
+  // problem: 1
+  // result: -1
+  // shared: false
+  // statistic_info: {time_cost: 71, memory_cost: 15593472}
+  // user_id: 1
+  // username: "root"
+}

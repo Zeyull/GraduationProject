@@ -24,7 +24,7 @@ public:
     }
 };`;
       break;
-    case 'Python':
+    case 'Python3':
       codeContext = `class Solution(object):
     def fn(params):
         //write code here`;
@@ -50,7 +50,7 @@ export function codeMirrorModeFn(languageType: string) {
     case 'C++':
       codeMode = 'text/x-c++src';
       break;
-    case 'Python':
+    case 'Python3':
       codeMode = 'text/x-python';
       break;
     case 'C':

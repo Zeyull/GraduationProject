@@ -18,23 +18,23 @@ const greenStyles = {
   borderColor: '#b7eb8f',
 };
 
-export default function LevelTag(props: { level: string | undefined }) {
+export default function LevelTag(props: { level: number | undefined }) {
   const { level } = props;
   let text = '简单';
   let color = 'green';
   let tagStyle;
   switch (level) {
-    case '1':
+    case 1:
       text = '简单';
       color = 'green';
       tagStyle = greenStyles;
       break;
-    case '2':
+    case 2:
       text = '中等';
       color = 'blue';
       tagStyle = blueStyles;
       break;
-    case '3':
+    case 3:
       text = '困难';
       color = 'red';
       tagStyle = redStyles;

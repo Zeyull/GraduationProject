@@ -1,6 +1,11 @@
 import styles from './index.less';
-import { Table } from 'antd';
+import { Table, message, Spin } from 'antd';
 import type { ColumnType } from 'antd/lib/table';
+import { userInfoAtom } from '@/jotai';
+import { useAtom } from 'jotai';
+import request from '@/utils/request';
+import { useState, useEffect } from 'react';
+import moment from 'moment';
 
 const columns: ColumnType<QuestionSubmissionHistory>[] = [
   {
@@ -9,10 +14,8 @@ const columns: ColumnType<QuestionSubmissionHistory>[] = [
     dataIndex: 'result',
     render: (_value: any, record) => {
       return (
-        <p
-          className={record.result ? styles.resultSuccess : styles.resultError}
-        >
-          {record.result ? '成功' : '失败'}
+        <p className={record.state ? styles.resultSuccess : styles.resultError}>
+          {record.state === 1 ? '成功' : '失败'}
         </p>
       );
     },
@@ -30,7 +33,7 @@ const columns: ColumnType<QuestionSubmissionHistory>[] = [
     title: '用时',
     dataIndex: 'consumeTime',
     render: (_value: any, record) => {
-      return <p>{record.consumeTime}ms</p>;
+      return <p>{record.time}ms</p>;
     },
   },
   {
@@ -38,46 +41,48 @@ const columns: ColumnType<QuestionSubmissionHistory>[] = [
     title: '提交时间',
     dataIndex: 'submitTime',
     render: (_value: any, record) => {
-      return <p>{record.submitTime}</p>;
+      return <p>{moment(record.date).format('YYYY/MM/DD HH:mm')}</p>;
     },
   },
 ];
 
-const tableData: QuestionSubmissionHistory[] = [
-  {
-    result: true,
-    language: 'JavaScript',
-    consumeTime: 93,
-    submitTime: '2022/03/27 11:01',
-  },
-  {
-    result: false,
-    language: 'C++',
-    consumeTime: 43,
-    submitTime: '2022/03/26 12:01',
-  },
-  {
-    result: true,
-    language: 'JavaScript',
-    consumeTime: 133,
-    submitTime: '2022/03/26 10:43',
-  },
-  {
-    result: true,
-    language: 'C++',
-    consumeTime: 50,
-    submitTime: '2022/03/25 16:45',
-  },
-];
-export default function SubmissionHistory() {
+export default function SubmissionHistory(props: {
+  question_id: number;
+  judgeLoading: boolean;
+}) {
+  const [userInfo] = useAtom(userInfoAtom);
+  const [tableData, setTableData] = useState([]);
+  const { question_id, judgeLoading } = props;
+  useEffect(() => {
+    async function firstLoad() {
+      const res = await request.get('/getJudgeSubmitsByID', {
+        params: {
+          uuid: userInfo.uuid === null ? 0 : userInfo.uuid,
+          question_id,
+        },
+      });
+      if (res.code >= 400) {
+        console.log(res.data);
+        message.error('获取题目提交历史记录请求错误');
+      } else if (res.code === 200) {
+        setTableData(res.data.list);
+      }
+    }
+    firstLoad();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [judgeLoading]);
   return (
     <div className={styles.mainContainer}>
-      <Table
-        columns={columns}
-        dataSource={tableData}
-        rowKey={(record) => record.submitTime}
-        pagination={false}
-      />
+      {judgeLoading ? (
+        <Spin style={{ marginLeft: '46%', marginTop: '10%' }} size="large" />
+      ) : (
+        <Table
+          columns={columns}
+          dataSource={tableData}
+          rowKey={(record) => record.date}
+          pagination={false}
+        />
+      )}
     </div>
   );
 }

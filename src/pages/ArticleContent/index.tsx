@@ -88,7 +88,7 @@ export default function ArticleContent(props: any) {
                 <span
                   className={styles.replyName}
                   onClick={() => {
-                    clickToPersonal(findComment.reply_id);
+                    clickToPersonal(findComment.uuid);
                   }}
                 >{`@${findComment.reply_name}`}</span>
                 <span>{':' + findComment.content}</span>

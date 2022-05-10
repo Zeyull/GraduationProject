@@ -70,8 +70,10 @@ export default function Personal(props: any) {
   const [isChangeUserData, setIsChangeUserData] = useState(false);
   const menuRef = useRef<HTMLInputElement>(null); // 如何解决null报错
 
+  const [submitArr, setSubmitArr] = useState<QuestionSubmissionHistory[]>([]);
+
   useEffect(() => {
-    async function firstLoad() {
+    async function userInfoLoad() {
       const userRes = await request.get('/getUserInfo', {
         params: {
           uuid,
@@ -84,11 +86,25 @@ export default function Personal(props: any) {
         message.error(userRes.msg);
       }
     }
+    async function firstLoad() {
+      const subRes = await request.get('/getSubHistoryByID', {
+        params: {
+          uuid,
+        },
+      });
+      if (subRes.code === 200) {
+        setSubmitArr(subRes.data.res);
+      } else if (subRes.code >= 400) {
+        message.error(subRes.msg);
+      }
+    }
+
     if (!isUserSelf) {
-      firstLoad();
+      userInfoLoad();
     } else {
       setRequestUser(userInfo);
     }
+    firstLoad();
   }, [uuid, userInfo.uuid, isUserSelf, userInfo]);
 
   // 图片状态改变回调
@@ -161,7 +177,7 @@ export default function Personal(props: any) {
     height: '310px',
     options: {
       title: {
-        text: '已完成题目总记录',
+        text: '每周题目总记录',
         bottom: '5%',
         left: '50%',
         textAlign: 'center',
@@ -187,45 +203,66 @@ export default function Personal(props: any) {
     },
   };
   // 图二
+  let rightValue = 0;
+  let wrongValue = 0;
+  submitArr.forEach((item) => {
+    if (item.state === 1) {
+      rightValue++;
+    } else {
+      wrongValue++;
+    }
+  });
   const optionChartsTwo = {
     width: '360px',
     height: '310px',
     options: {
+      tooltip: {
+        trigger: 'item',
+      },
       legend: {
-        top: 'bottom',
+        top: '5%',
+        left: 'center',
       },
       series: [
         {
-          name: 'Nightingale Chart',
+          name: 'Access From',
           type: 'pie',
-          radius: [10, 90],
-          center: ['50%', '40%'],
-          roseType: 'area',
+          radius: ['40%', '70%'],
+          avoidLabelOverlap: false,
           itemStyle: {
-            borderRadius: 8,
+            borderRadius: 10,
+            borderColor: '#fff',
+            borderWidth: 2,
+          },
+          label: {
+            show: false,
+            position: 'center',
+          },
+          emphasis: {
+            label: {
+              show: true,
+              fontSize: '40',
+              fontWeight: 'bold',
+            },
+          },
+          labelLine: {
+            show: false,
           },
           data: [
-            { value: 40, name: 'rose 1' },
-            { value: 38, name: 'rose 2' },
-            { value: 32, name: 'rose 3' },
-            { value: 30, name: 'rose 4' },
-            { value: 28, name: 'rose 5' },
-            { value: 26, name: 'rose 6' },
-            { value: 22, name: 'rose 7' },
-            { value: 18, name: 'rose 8' },
+            { value: wrongValue, name: '错误提交' },
+            { value: rightValue, name: '正确提交' },
           ],
         },
       ],
     },
   };
-
   let MenuContent;
   switch (menuKey) {
     case 'note':
       MenuContent = <MyArticle isUserSelf={isUserSelf} uuid={uuid} />;
       break;
     case 'history':
-      MenuContent = <SubmitTimeLine />;
+      MenuContent = <SubmitTimeLine submitArr={submitArr} />;
       break;
     case 'setting':
       MenuContent = (
@@ -323,7 +360,7 @@ export default function Personal(props: any) {
           <div className={styles.chartTwo}>
             <Charts option={optionChartsTwo} />
           </div>
-          <PiePattern />
+          <PiePattern uuid={uuid} />
         </div>
         <div className={styles.menuContainer} ref={menuRef}>
           {MenuContent}

@@ -1,74 +1,28 @@
 import styles from './index.less';
 import { CalendarOutlined } from '@ant-design/icons';
 import { getNowDate } from '@/utils/date';
+import moment from 'moment';
+import { history } from 'umi';
 
-const optionsArr: DailyQuestionOption[] = [
-  {
-    id: '#120',
-    index: 30,
-    name: '数气球',
-    state: false,
-    date: '2022/03/16',
-  },
-  {
-    id: '#120',
-    index: 30,
-    name: '数气球',
-    state: false,
-    date: '2022/03/16',
-  },
-  {
-    id: '#120',
-    index: 30,
-    name: '数气球',
-    state: false,
-    date: '2022/03/16',
-  },
-  {
-    id: '#120',
-    index: 30,
-    name: '数气球',
-    state: false,
-    date: '2022/03/16',
-  },
-  {
-    id: '#120',
-    index: 30,
-    name: '数气球',
-    state: false,
-    date: '2022/03/16',
-  },
-  {
-    id: '#120',
-    index: 30,
-    name: '数气球',
-    state: false,
-    date: '2022/03/16',
-  },
-  {
-    id: '#121',
-    index: 101,
-    name: '背包问题',
-    state: true,
-    date: '2022/03/17',
-  },
-  {
-    id: '#122',
-    index: 10,
-    name: '飞碟的数量',
-    state: false,
-    date: '2022/03/18',
-  },
-  {
-    id: '#123',
-    index: 23,
-    name: '树的前序遍历',
-    state: true,
-    date: '2022/03/19',
-  },
-].reverse();
+export default function DailyQuestionList(props: {
+  dailyQuestion: any;
+  allQuestion: any;
+}) {
+  const { dailyQuestion, allQuestion } = props;
+  const optionsArr: DailyQuestionOption[] = [];
+  dailyQuestion.forEach((item: any) => {
+    const findQuestion = allQuestion.find((qitem: any) => {
+      return item.question_id === qitem.question_id;
+    });
+    optionsArr.push({
+      date: item.date,
+      question_id: item.question_id,
+      question_index: findQuestion.question_index,
+      question_name: findQuestion.question_name,
+      state: findQuestion.state,
+    });
+  });
 
-export default function DailyQuestionList() {
   return (
     <div className={styles.mainContainer}>
       <p className={styles.title}>每日一题</p>
@@ -93,9 +47,13 @@ export default function DailyQuestionList() {
 
 function DailyQuestionItem(props: { option: DailyQuestionOption }) {
   const option = props.option;
-  const { index, name, state, date } = option;
-  const nowDateBoolean = getNowDate('L') === date ? true : false;
-  // id
+  const { question_index, question_name, state, date, question_id } = option;
+  const nowDateBoolean =
+    getNowDate('L') === moment(date).format('YYYY-MM-DD') ? true : false;
+  function toCodePage() {
+    history.push(`/code/${question_id}`);
+  }
+
   return (
     <div
       className={
@@ -103,13 +61,14 @@ function DailyQuestionItem(props: { option: DailyQuestionOption }) {
           ? `${styles.itemContainer} ${styles.nowDate}`
           : styles.itemContainer
       }
+      onClick={toCodePage}
     >
       <div className={styles.itemTitle}>
         <CalendarOutlined />
-        <p>{date}</p>
+        <p>{moment(date).format('YYYY-MM-DD')}</p>
       </div>
       <p className={styles.indexName}>
-        {index}.{name}
+        {question_index}.{question_name}
       </p>
       {state ? (
         <p className={styles.finished}>已完成</p>

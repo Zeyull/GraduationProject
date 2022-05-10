@@ -203,12 +203,12 @@ function LoginForm(props: {
           </Form.Item>
 
           <Form.Item>
-            <Form.Item name="remember" valuePropName="checked">
+            {/* <Form.Item name="remember" valuePropName="checked">
               <Checkbox>记住我</Checkbox>
-            </Form.Item>
-            <Form.Item>
+            </Form.Item> */}
+            {/* <Form.Item>
               <span>忘记密码</span>
-            </Form.Item>
+            </Form.Item> */}
           </Form.Item>
         </>
       )}

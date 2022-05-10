@@ -16,9 +16,14 @@ import {
   UpCircleFilled,
   LockOutlined,
 } from '@ant-design/icons';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import LevelTag from '@/components/LevelTag';
 import { useAuth } from '@/utils/auth';
+import request from '@/utils/request';
+import { userInfoAtom } from '@/jotai';
+import { useAtom } from 'jotai';
+import { history } from 'umi';
+import moment from 'moment';
 
 const { Search } = Input;
 
@@ -26,11 +31,11 @@ const columns: ColumnType<QuestionOption>[] = [
   {
     title: '题目',
     dataIndex: 'name',
-    sorter: (a, b) => a.index - b.index,
+    sorter: (a, b) => a.question_index - b.question_index,
     render: (_value: any, record: QuestionOption) => {
       return (
         <p>
-          {record.index}.{record.name}
+          {record.question_index}.{record.question_name}
         </p>
       );
     },
@@ -53,10 +58,10 @@ const columns: ColumnType<QuestionOption>[] = [
   {
     align: 'center',
     title: '通过率',
-    dataIndex: 'passRate',
+    dataIndex: 's',
     sorter: (a, b) => (a.passRate as number) - (b.passRate as number),
     render: (_value: any, record: QuestionOption) => {
-      return <p>{record.passRate}%</p>;
+      return <p>{((record.passRate as number) * 100).toFixed(2)}%</p>;
     },
   },
   {
@@ -74,143 +79,122 @@ const columns: ColumnType<QuestionOption>[] = [
     },
   },
 ];
-// mock数据
-const data: QuestionOption[] = [
-  {
-    id: '23',
-    index: 23,
-    name: '接雨水',
-    state: false,
-    level: '3',
-    solutions: 79,
-    passRate: 35,
-  },
-  {
-    id: '131',
-    index: 131,
-    name: '打家拦舍',
-    state: true,
-    level: '2',
-    solutions: 129,
-    passRate: 75,
-  },
-  {
-    id: '1',
-    index: 1,
-    name: '两数之和',
-    state: true,
-    level: '1',
-    solutions: 100,
-    passRate: 65,
-  },
-  {
-    id: '22',
-    index: 22,
-    name: '接雨水-改',
-    state: false,
-    level: '3',
-    solutions: 49,
-    passRate: 37,
-  },
-  {
-    id: '43',
-    index: 43,
-    name: '背包问题',
-    state: true,
-    level: '2',
-    solutions: 65,
-    passRate: 50,
-  },
-  {
-    id: '63',
-    index: 63,
-    name: '完全背包问题',
-    state: true,
-    level: '2',
-    solutions: 191,
-    passRate: 65,
-  },
-  {
-    id: '64',
-    index: 64,
-    name: '01背包问题',
-    state: true,
-    level: '2',
-    solutions: 15,
-    passRate: 43,
-  },
-  {
-    id: '5',
-    index: 5,
-    name: '二叉树的前序遍历',
-    state: true,
-    level: '1',
-    solutions: 10,
-    passRate: 70,
-  },
-  {
-    id: '6',
-    index: 6,
-    name: '二叉树的中序遍历',
-    state: true,
-    level: '1',
-    solutions: 14,
-    passRate: 60,
-  },
-  {
-    id: '7',
-    index: 7,
-    name: '二叉树的后序遍历',
-    state: true,
-    level: '1',
-    solutions: 12,
-    passRate: 43,
-  },
-];
 
 export default function Home() {
   const { isLogin } = useAuth();
-  const [tableData, setTableData] = useState(data);
+  const [userInfo] = useAtom(userInfoAtom);
+  const [tableData, setTableData] = useState([]);
+  const [originTableData, setOriginTableData] = useState([]);
+  const [dailyQuestion, setDailyQuestion] = useState([]);
   const [currentKey, setCurrentKey] = useState('all');
-  const keepDays = 31;
-  const todayQuestionBoolean = true;
+  const [days, setDays] = useState(0);
+  const [isCompleted, setIsCompleted] = useState(false);
   const handleClick = (e: any) => {
     if (!isLogin) {
       return;
     }
     setCurrentKey(e.key);
   };
-  const onSearch = (value: string) => console.log(value);
+  const onSearch = (value: string) => {
+    if (value === '') {
+      setTableData(originTableData);
+    }
+    setTableData(
+      originTableData.filter((item: any) => item.question_name.includes(value)),
+    );
+  };
 
   // 加载更多的题目
   const loadQuestion = () => {
-    setTableData([...data, ...tableData]);
+    message.warn('暂无更多');
   };
 
-  const clickSort = () => {
+  const clickSort = (e: any) => {
     if (!isLogin) {
       return message.error('请先登录');
     }
+    const key = e.key;
+    if (key === 'Incomplete') {
+      setTableData(originTableData.filter((item: any) => item.state === 0));
+    } else if (key === 'fire') {
+      setTableData(
+        originTableData.sort(
+          (a: any, b: any) => (b.solutions as number) - (a.solutions as number),
+        ),
+      );
+    } else if (key === 'all') {
+      setTableData(originTableData);
+    }
   };
+
+  useEffect(() => {
+    async function firstLoad() {
+      const quesstionRes = await request.get('/getAllQuestion', {
+        params: {
+          uuid: userInfo.uuid === null ? 0 : userInfo.uuid,
+        },
+      });
+      setTableData(quesstionRes.data.question);
+      setOriginTableData(quesstionRes.data.question);
+      const dailyRes = await request.get('/getDailyQuestion');
+      if (dailyRes.code === 200) {
+        setDailyQuestion(dailyRes.data.data.reverse());
+      }
+      const nowDate = moment().format('YYYY-MM-DD');
+      const originTableData = quesstionRes.data.question;
+      const dailyQuestion = dailyRes.data.data;
+      let days = 0;
+      dailyQuestion.forEach((item: any) => {
+        const findQ = originTableData.find(
+          (oitem: any) =>
+            oitem.question_id === item.question_id && oitem.state === 1,
+        );
+        if (findQ !== undefined) {
+          days++;
+          if (nowDate === moment(item.date).format('YYYY-MM-DD')) {
+            setIsCompleted(true);
+          }
+        }
+      });
+      setDays(days);
+    }
+    firstLoad();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  function goToCodePage(question_id: number) {
+    history.push(`/code/${question_id}`);
+  }
+
+  function linkToRandomQuestion() {
+    const random = Math.floor(Math.random() * (originTableData.length - 1)) + 1;
+    history.push(`/code/${random}`);
+  }
 
   return (
     <div className={styles.mainContainer}>
       {/* <div className={styles.pageContainer}>1</div> */}
       <div className={styles.dailyQuestionContainer}>
         <div className={styles.dailyQuestion}>
-          <DailyQuestionList />
+          <DailyQuestionList
+            dailyQuestion={dailyQuestion}
+            allQuestion={originTableData}
+          />
         </div>
         <div className={styles.recordContainer}>
-          <DailyCalendar />
+          <DailyCalendar
+            dailyQuestion={dailyQuestion}
+            uuid={userInfo.uuid === null ? 0 : userInfo.uuid}
+          />
           <div className={styles.recordBool}>
             <p>今日一题</p>
-            {todayQuestionBoolean ? (
+            {isCompleted ? (
               <p className={styles.success}>已完成</p>
             ) : (
               <p className={styles.error}>未完成</p>
             )}
           </div>
-          <p className={styles.recordKeep}>已连续打卡{keepDays}天</p>
+          <p className={styles.recordKeep}>已打卡{days}天</p>
           <div
             className={styles.unLoginMask}
             style={{ display: isLogin ? 'none' : 'inline' }}
@@ -254,18 +238,26 @@ export default function Home() {
         <Table
           columns={columns}
           dataSource={tableData}
-          rowKey={(record) => record.id}
+          rowKey={(record) => record.question_id}
           className={styles.listQuestionTable}
           showSorterTooltip={false}
           pagination={false}
+          onRow={(record) => {
+            return {
+              onClick: () => {
+                goToCodePage(record.question_id);
+              },
+            };
+          }}
         />
         <div className={styles.rightOverflow}>
           <div className={styles.rightStickyContainer}>
-            <PiePattern />
+            <PiePattern uuid={userInfo.uuid === null ? 0 : userInfo.uuid} />
             <Button
               type="primary"
               className={styles.randomButton}
               icon={<RetweetOutlined />}
+              onClick={linkToRandomQuestion}
             >
               随机一题
             </Button>

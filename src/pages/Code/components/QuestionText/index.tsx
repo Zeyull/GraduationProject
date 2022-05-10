@@ -2,32 +2,27 @@ import styles from './index.less';
 import MarkdownPreview from '@uiw/react-markdown-preview';
 import LevelTag from '@/components/LevelTag';
 
-export default function QuestionText(props: { questionMd: string }) {
-  const { questionMd } = props;
-  const questionInfo: DetailQuestionOption = {
-    id: '682',
-    index: 682,
-    name: '棒球比赛',
-    state: false,
-    passRate: 80,
-    solutions: 63,
-    allSubmission: 100,
-    successSubmission: 80,
-    level: '1',
-  };
+export default function QuestionText(props: {
+  questionInfo: DetailQuestionOption;
+}) {
+  const { questionInfo } = props;
   return (
     <div className={styles.mainContainer}>
       <div className={styles.header}>
         <p className={styles.title}>
-          {questionInfo.index}. &nbsp; {questionInfo.name}
+          {questionInfo.question_index}. &nbsp; {questionInfo.question_name}
         </p>
         <LevelTag level={questionInfo.level} />
         <p className={styles.subTitle}>
           提交次数：{questionInfo.allSubmission} ｜ 成功次数：
-          {questionInfo.successSubmission} ｜通过率： {questionInfo.passRate}%
+          {questionInfo.successSubmission} ｜通过率：{' '}
+          {((questionInfo.passRate as number) * 100).toFixed(2)}%
         </p>
       </div>
-      <MarkdownPreview source={questionMd} className={styles.questionText} />
+      <MarkdownPreview
+        source={questionInfo.content}
+        className={styles.questionText}
+      />
     </div>
   );
 }

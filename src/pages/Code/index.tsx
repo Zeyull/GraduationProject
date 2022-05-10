@@ -1,5 +1,5 @@
 import styles from './index.less';
-import { Menu, Select, Popover, Button, Tooltip } from 'antd';
+import { Menu, Select, Popover, Button, Tooltip, message } from 'antd';
 import {
   FileTextOutlined,
   HighlightOutlined,
@@ -11,17 +11,19 @@ import {
   ApiOutlined,
   LockOutlined,
 } from '@ant-design/icons';
-import questionMD from './questionMD.js';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import QuestionText from './components/QuestionText';
 import SubmissionHistory from './components/SubmissionHistory';
 import SolutionsComments from './components/SolutionsComments';
 import CodeDrawer from './components/CodeDrawer';
 import { useAtom } from 'jotai';
-import { isFullCodePage } from '@/jotai';
+import { isFullCodePage, userInfoAtom } from '@/jotai';
 import { codemirrorOnchange, getCodeMirrorOptions } from '@/utils/codeOptionFn';
 import { defaultCodeContextFn, codeMirrorModeFn } from '@/utils/defaultCode';
 import { useAuth } from '@/utils/auth';
+import request from '@/utils/request';
+import moment from 'moment';
+
 // codemirror 基础文件
 import { UnControlled as ReactCodeMirror } from 'react-codemirror2';
 import 'codemirror/lib/codemirror.css';
@@ -59,45 +61,68 @@ import 'codemirror/addon/lint/lint.css'; // 错误校验
 
 const { Option } = Select;
 
-export default function Code() {
+const defaultData: DetailQuestionOption = {
+  question_id: 1,
+  question_index: 1,
+  question_name: '题目',
+  state: false,
+  level: 1,
+  solutions: 50,
+  passRate: 60,
+  allSubmission: 60,
+  successSubmission: 40,
+  content: '',
+};
+
+export default function Code(props: any) {
+  const question_id = Number(props.match.params.id);
   const { isLogin } = useAuth();
+  const [judgeLoading, setJudgeLoading] = useState(false);
+  const [language, setLanguage] = useState('JavaScript');
+  const [questionInfo, setQuestionInfo] =
+    useState<DetailQuestionOption>(defaultData);
+  const [menuKeys, setMenuKeys] = useState(['text']);
+  const [codeConent, setCodeContent] = useState(
+    defaultCodeContextFn('JavaScript', 'any'),
+  );
   const [menuComponent, setMenuComponent] = useState(
-    <QuestionText questionMd={questionMD} />,
+    <QuestionText questionInfo={questionInfo} />,
   );
   const [isFullPage, setIsCodeFullPage] = useAtom(isFullCodePage);
+  const [userInfo] = useAtom(userInfoAtom);
   const [defaultCodeContext, setDefaultCodeContext] = useState(
     defaultCodeContextFn('JavaScript', 'any'),
   );
   const [codeMirrorMode, setCodeMirrorMode] = useState(
     codeMirrorModeFn('JavaScript'),
   );
+  const [judgeRes, setJudgeRes] = useState<any>({});
+
   const menuClick = (e: any) => {
+    setMenuKeys([e.keyPath[0]]);
     switch (e.keyPath[0]) {
       case 'text':
-        setMenuComponent(<QuestionText questionMd={questionMD} />);
+        setMenuComponent(<QuestionText questionInfo={questionInfo} />);
         break;
       case 'solutions':
         setMenuComponent(<SolutionsComments />);
         break;
       case 'history':
-        setMenuComponent(<SubmissionHistory />);
+        setMenuComponent(
+          <SubmissionHistory
+            question_id={question_id}
+            judgeLoading={judgeLoading}
+          />,
+        );
     }
   };
   const isFullCodePageClick = () => {
     setIsCodeFullPage((pre) => !pre);
   };
-  // const [md, handleMD] = useState('loading... ...');
-
-  // useEffect(() => {
-  // request.get('public/questionMd.md')
-  //   fetch('public/questionMd.md')
-  //     .then((res) => {console.log(res); return res.text()})
-  //     .then((txt) => {console.log(txt);handleMD(txt)});
-
-  // }, [md]);
 
   // 处理语言选择栏选择结果
   const handleLanguageSelect = (e: any) => {
+    setLanguage(e);
     setDefaultCodeContext(defaultCodeContextFn(e, 'any'));
     setCodeMirrorMode(codeMirrorModeFn(e));
   };
@@ -109,6 +134,59 @@ export default function Code() {
       </p>
     </div>
   );
+
+  function resetCode() {
+    setDefaultCodeContext(defaultCodeContextFn(language, 'any'));
+  }
+  // 提交代码
+  async function submitCode() {
+    setMenuKeys(['history']);
+    setMenuComponent(
+      <SubmissionHistory question_id={question_id} judgeLoading={true} />,
+    );
+    setJudgeLoading(true);
+    console.log(codeConent);
+    const res = await request.post('/judgeCode', {
+      data: {
+        question_id,
+        code: codeConent,
+        language,
+        uuid: userInfo.uuid,
+        time: moment().format('YYYY-MM-DD HH:mm:ss'),
+      },
+    });
+    if (res.code >= 400) {
+      message.error(res.msg);
+    } else if (res.code === 200) {
+      message.success(res.msg);
+      setJudgeRes(res.data.result);
+    }
+    setJudgeLoading(false);
+    setMenuComponent(
+      <SubmissionHistory question_id={question_id} judgeLoading={false} />,
+    );
+  }
+
+  useEffect(() => {
+    async function firstLoad() {
+      const questionRes = await request.get('/getQuestionByID', {
+        params: {
+          question_id,
+          uuid: userInfo.uuid,
+        },
+      });
+      if (questionRes.code === 200) {
+        setQuestionInfo(questionRes.data.question);
+        setMenuComponent(
+          <QuestionText questionInfo={questionRes.data.question} />,
+        );
+      } else if (questionRes.code >= 400) {
+        message.error(questionRes.msg);
+      }
+    }
+    firstLoad();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div
@@ -124,6 +202,7 @@ export default function Code() {
           mode="horizontal"
           defaultSelectedKeys={['text']}
           onClick={menuClick}
+          selectedKeys={menuKeys}
           className={styles.menuSelect}
         >
           <Menu.Item key="text" icon={<FileTextOutlined />}>
@@ -143,16 +222,17 @@ export default function Code() {
         <div className={styles.codeOptions}>
           <div className={styles.languageOptions}>
             <Select
-              defaultValue="JavaScript"
+              defaultValue={language}
               style={{ width: 120 }}
               onChange={handleLanguageSelect}
+              value={language}
               className={styles.languageSelect}
             >
               <Option value="JavaScript">JavaScript</Option>
               <Option value="C++">C++</Option>
               <Option value="C">C</Option>
               <Option value="Java">Java</Option>
-              <Option value="Python">Python</Option>
+              <Option value="Python3">Python3</Option>
             </Select>
             <Popover
               className={styles.popoverText}
@@ -161,13 +241,13 @@ export default function Code() {
               trigger="click"
             >
               <div className={styles.greenCircle} />
-              <p>核心代码模式</p>
+              <p>ACM代码模式</p>
             </Popover>
           </div>
           <div className={styles.otherOptions}>
-            <QuestionCircleOutlined />
+            {/* <QuestionCircleOutlined /> */}
             <Tooltip title={<p>重制代码</p>}>
-              <RedoOutlined />
+              <RedoOutlined onClick={resetCode} />
             </Tooltip>
             {isFullPage ? (
               <CompressOutlined onClick={isFullCodePageClick} />
@@ -180,17 +260,21 @@ export default function Code() {
           <ReactCodeMirror
             value={defaultCodeContext}
             options={getCodeMirrorOptions(codeMirrorMode)}
-            onChange={codemirrorOnchange}
+            onChange={(editor, data, value) => {
+              setCodeContent(value);
+              codemirrorOnchange(editor, data, value);
+            }}
           />
         </div>
-        <CodeDrawer />
+        <CodeDrawer runVal={judgeRes} isLoading={judgeLoading} />
+
         <div className={styles.codeButton}>
-          <Button className={styles.submit} type="primary">
+          <Button className={styles.submit} type="primary" onClick={submitCode}>
             提交
           </Button>
-          <Button className={styles.test} icon={<ApiOutlined />}>
+          {/* <Button className={styles.test} icon={<ApiOutlined />}>
             测试
-          </Button>
+          </Button> */}
         </div>
         <div
           className={styles.unLoginMask}

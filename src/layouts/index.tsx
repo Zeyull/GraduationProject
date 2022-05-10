@@ -9,9 +9,9 @@ export default function IndexLayout(props: any) {
   const isFullPage = useAtom(isFullCodePage)[0];
   const path = history.location.pathname;
   const showBottom =
-    path === '/code' ||
+    path.includes('/code') ||
     path === '/article-list' ||
-    path === '/article-content' ||
+    path.includes('/article-content') ||
     path === '/front-code' ||
     path === '/create-article';
   return (
