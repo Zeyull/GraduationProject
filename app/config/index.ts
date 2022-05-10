@@ -27,6 +27,11 @@ const config = {
     },
     hash:{
         salt: process.env.HASH_SALT,
+    },
+    code:{
+        session:process.env.SESSION,
+        csrftoken:process.env.CSRFTOKEN,
+        long_session:process.env.LONGSESSION
     }
 }
 export default config;

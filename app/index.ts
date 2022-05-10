@@ -9,9 +9,22 @@ import AccessLoggerMiddleware from './middleware/AccessLoggerMiddleware';
 import koaBody  from 'koa-body';
 import koaStatic from 'koa-static'
 import path from 'path';
+import moment from 'moment';
+import QuestionService from './service/QuestionService';
+import schedule from 'node-schedule';
 const app = new Koa;
 // 全局验证码Map
 export const captchaMap = new Map<string, string | null>();
+
+// 生成每日一题
+let rule = new schedule.RecurrenceRule();
+rule.hour =0;
+rule.minute =0;
+rule.second =0;
+// 启动任务
+const job = schedule.scheduleJob(rule, () => {
+    QuestionService.createDailyQuestion(moment().format('YYYY-MM-DD HH:mm:ss'));
+});
 
 app
 .use(koaBody({
