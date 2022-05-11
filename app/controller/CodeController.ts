@@ -100,7 +100,7 @@ class CodeController{
             // @ts-ignore
             res[index].dataValues.passRate = commitsQuestion[index] === 0 ? 0 :  rightQuestion[index]/ commitsQuestion[index];
             // @ts-ignore
-            res[index].dataValues.state =  questionStatus[index] === null ||  questionStatus[index] ===  0 ? 0 : 1;
+            res[index].dataValues.state =  questionStatus[index] === null ||  questionStatus[index].state ===  0 ? 0 : 1;
             // @ts-ignore
             res[index].dataValues.solutions =  solutionsArr[index];
             
@@ -160,7 +160,6 @@ class CodeController{
                 console.log(err);
             });
         }
-
         if(apiRes.result === 0){
             await QuestionService.createUserQuestion({
                 uuid:Number(data.uuid),
@@ -178,7 +177,7 @@ class CodeController{
                 state:0,
                 date:data.time,
                 language:apiRes.language,
-                time:apiRes.statistic_info.err_info === undefined ? "0" : apiRes.statistic_info.err_info,
+                time:apiRes.statistic_info.err_info === undefined ? apiRes.statistic_info.time_cost : "0",
                 submission_id:submissionID
             });
         }

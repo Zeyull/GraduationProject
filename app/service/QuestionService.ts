@@ -17,7 +17,7 @@ class QuestionService{
         return UserQuestion.count({where: {question_id,state:1}});
     }
     async getUserQuestionStatus(uuid:number,question_id:number){
-        return UserQuestion.findOne({where: {uuid,question_id},attributes:['state']});
+        return UserQuestion.findOne({where: {uuid,question_id,state:1},attributes:['state']});
     }
     // 获取用户的某个题信息
     async getUserQuestionInfo(uuid:number,question_id:number){
