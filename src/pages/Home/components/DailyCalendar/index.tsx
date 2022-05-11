@@ -19,13 +19,13 @@ export default function DailyCalendar(props: {
 
   useEffect(() => {
     async function firstLoad() {
-      const res = await request.get('/getSubHistoryByID', {
+      const res = await request.get('/getAllQuestion', {
         params: {
           uuid,
         },
       });
       if (res.code === 200) {
-        setSubHistory(res.data.res);
+        setSubHistory(res.data.question);
       }
     }
     firstLoad();
@@ -50,6 +50,7 @@ export default function DailyCalendar(props: {
             item.question_id === newItem.question_id && newItem.state === 1,
         );
         if (res !== undefined) {
+          console.log(res);
           return true;
         }
       }

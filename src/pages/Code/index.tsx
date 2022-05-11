@@ -23,6 +23,7 @@ import { defaultCodeContextFn, codeMirrorModeFn } from '@/utils/defaultCode';
 import { useAuth } from '@/utils/auth';
 import request from '@/utils/request';
 import moment from 'moment';
+import { judgeReutrn } from '@/utils/dataHandle';
 
 // codemirror 基础文件
 import { UnControlled as ReactCodeMirror } from 'react-codemirror2';
@@ -65,7 +66,7 @@ const defaultData: DetailQuestionOption = {
   question_id: 1,
   question_index: 1,
   question_name: '题目',
-  state: false,
+  state: 0,
   level: 1,
   solutions: 50,
   passRate: 60,
@@ -158,8 +159,14 @@ export default function Code(props: any) {
     if (res.code >= 400) {
       message.error(res.msg);
     } else if (res.code === 200) {
-      message.success(res.msg);
       setJudgeRes(res.data.result);
+      const result = judgeReutrn(res.data.result);
+      console.log(res.data.result);
+      if (result.res) {
+        message.success(result.status);
+      } else {
+        message.warn(result.status);
+      }
     }
     setJudgeLoading(false);
     setMenuComponent(

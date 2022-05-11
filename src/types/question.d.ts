@@ -2,7 +2,7 @@ declare interface QuestionOption {
   question_id: number;
   question_index: number;
   question_name: string;
-  state: boolean;
+  state: number;
   level?: number; // 3-difficult 2-medium 1-easy
   solutions?: number;
   passRate?: number;

@@ -90,11 +90,15 @@ export function judgeReutrn(info: any) {
       break;
     case 5:
       status = 'SYSTEM_ERROR';
+      break;
+    default:
+      status = 'CODE_ERROR';
   }
   if (info.result === 0) {
     return {
       res: true,
       msg: `${status} 运行成功\n运行时间共${info.statistic_info.time_cost}ms 占用空间共${info.statistic_info.memory_cost}bit`,
+      status,
     };
   } else {
     const msgErr =
@@ -104,6 +108,7 @@ export function judgeReutrn(info: any) {
     return {
       res: false,
       msg: `${status} 失败\n${msgErr}`,
+      status,
     };
   }
   // can_unshare: true

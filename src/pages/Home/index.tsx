@@ -71,7 +71,7 @@ const columns: ColumnType<QuestionOption>[] = [
     className: 'icon',
     sorter: (a, b) => Number(a.state) - Number(b.state),
     render: (_value: any, record: QuestionOption) => {
-      return record.state ? (
+      return record.state === 1 ? (
         <CheckSquareOutlined style={{ color: '#0FC6C2' }} />
       ) : (
         <CloseSquareOutlined style={{ color: '#CB2634' }} />
@@ -213,7 +213,7 @@ export default function Home() {
           mode="horizontal"
           className={styles.listQuestionMenu}
         >
-          <Menu.Item key="all" icon={<SettingOutlined />}>
+          <Menu.Item key="all" icon={<SettingOutlined />} onClick={clickSort}>
             全部题目
           </Menu.Item>
           <Menu.Item

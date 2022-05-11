@@ -99,7 +99,7 @@ export default function PersonalData(props: {
         rules={emailRules}
         style={{ gridArea: 'e' }}
       >
-        <Input />
+        <Input readOnly />
       </Form.Item>
       <Form.Item
         name="introduction"

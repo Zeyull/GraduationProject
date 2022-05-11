@@ -70,7 +70,7 @@ function DailyQuestionItem(props: { option: DailyQuestionOption }) {
       <p className={styles.indexName}>
         {question_index}.{question_name}
       </p>
-      {state ? (
+      {state === 1 ? (
         <p className={styles.finished}>已完成</p>
       ) : (
         <p className={styles.unFinished}>未完成</p>

@@ -58,8 +58,10 @@ export default function PiePattern(props: { uuid: number }) {
   let difR = 0;
   let midR = 0;
   let easR = 0;
+  const idMap = new Map();
   submitArr.forEach((item: any) => {
-    if (item.state !== 0) {
+    if (item.state !== 0 && !idMap.has(item.question_id)) {
+      idMap.set(item.question_id, 1);
       if (item.level === 1) {
         easR++;
       }

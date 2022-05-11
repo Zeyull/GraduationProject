@@ -238,13 +238,6 @@ export default function Personal(props: any) {
             show: false,
             position: 'center',
           },
-          emphasis: {
-            label: {
-              show: true,
-              fontSize: '40',
-              fontWeight: 'bold',
-            },
-          },
           labelLine: {
             show: false,
           },
@@ -316,6 +309,7 @@ export default function Personal(props: any) {
             onClick={menuHandleClick}
             mode="vertical"
             defaultSelectedKeys={['note']}
+            selectedKeys={[menuKey]}
           >
             <Menu.Item
               key="note"

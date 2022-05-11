@@ -5,9 +5,15 @@ export function defaultCodeContextFn(
   let codeContext = '';
   switch (languageType) {
     case 'JavaScript':
-      codeContext = `var fn = function(params) {
+      codeContext = `const readline = require('readline');
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+})
+rl.on('line', (input) => {
     //write code here
-};`;
+    //console.log(xxx)
+})`;
       break;
     case 'Java':
       codeContext = `class Solution {
