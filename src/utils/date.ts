@@ -3,7 +3,7 @@ import * as _ from 'lodash';
 moment.locale('zh-cn');
 const monthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
 const monthDaysLeap = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
-const monthName = [
+export const monthName = [
   'Jan',
   'Feb',
   'Mar',

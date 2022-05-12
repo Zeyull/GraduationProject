@@ -9,13 +9,13 @@ const { TextArea } = Input;
 export default function CodeDrawer(props: { runVal: any; isLoading: boolean }) {
   const { runVal, isLoading } = props;
   const res = judgeReutrn(runVal);
-  const msg = res.msg;
-  let status = 'normal';
-  if (res.res === true) {
-    status = 'success';
-  } else if (res.res === false) {
-    status = 'fail';
-  }
+  // const msg = res.msg;
+  // let status = 'normal';
+  // if (res.res === true) {
+  //   status = 'success';
+  // } else if (res.res === false) {
+  //   status = 'fail';
+  // }
   const [isOpenDrawer, setIsOpenDrawer] = useState(true);
   const [inputValue, setInputValue] = useState('');
   const [standardVal, _setStandardVal] = useState('');
@@ -31,11 +31,11 @@ export default function CodeDrawer(props: { runVal: any; isLoading: boolean }) {
 
   const textareaClass = () => {
     let className = '';
-    switch (status) {
-      case 'success':
+    switch (res.res) {
+      case true:
         className = styles.success;
         break;
-      case 'fail':
+      case false:
         className = styles.fail;
         break;
     }
@@ -79,12 +79,19 @@ export default function CodeDrawer(props: { runVal: any; isLoading: boolean }) {
           <Spin />
         ) : (
           <div className={`${styles.runInput} ${textareaClass()}`}>
-            <p>运行结果</p>
-            <TextArea
+            {res.res === 'normal' ? (
+              <span>运行结果</span>
+            ) : (
+              <span>{res.res ? '结果正确:' : '结果错误:'}</span>
+            )}
+            <div className={`${styles.returnBox} `}>
+              {res.res === 'normal' ? '' : <p>{res.msg}</p>}
+            </div>
+            {/* <TextArea
               value={msg}
               autoSize={{ minRows: 3, maxRows: 3 }}
               readOnly
-            />
+            /> */}
           </div>
         )}
 

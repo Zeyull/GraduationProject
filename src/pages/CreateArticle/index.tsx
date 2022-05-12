@@ -15,7 +15,8 @@ import { history } from 'umi';
 // 注册插件（如果有的话）
 // MdEditor.use(YOUR_PLUGINS_HERE);
 
-export default function CreateArticle() {
+export default function CreateArticle(props: any) {
+  const question_id = props.location.query?.id;
   const [userInfo] = useAtom(userInfoAtom);
   // 标题内容
   const [titleText, SetTitleText] = useState('');
@@ -153,11 +154,13 @@ export default function CreateArticle() {
       message.error('文章标题不能为空');
       return;
     }
-    if (tags === '') {
+    if (tags === '[]') {
       message.error('每篇文章至少一个标签');
+      return;
     }
     if (mdText === '') {
       message.error('文章内容不能为空');
+      return;
     }
     form.append('article_title', titleText);
     form.append('time', time);
@@ -168,17 +171,20 @@ export default function CreateArticle() {
     form.append('author_id', userInfo.uuid);
     // @ts-ignore
     form.append('file', imgFile);
-    const res = await request.post('/createArticle', {
-      requestType: 'form',
-      headers: { 'Content-Type': 'multipart/form-data' },
-      data: form,
-    });
-    if (res.code >= 400) {
-      message.error(res.msg);
-    } else if (res.code === 200) {
-      message.success(res.msg);
-      history.push(`/article-content/${res.data.article_id}`);
+    if (question_id !== undefined) {
+      form.append('question_id', question_id);
     }
+    // const res = await request.post('/createArticle', {
+    //   requestType: 'form',
+    //   headers: { 'Content-Type': 'multipart/form-data' },
+    //   data: form,
+    // });
+    // if (res.code >= 400) {
+    //   message.error(res.msg);
+    // } else if (res.code === 200) {
+    //   message.success(res.msg);
+    //   history.push(`/article-content/${res.data.article_id}`);
+    // }
   }
 
   // 离开后保存草稿

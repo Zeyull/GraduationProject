@@ -2,8 +2,14 @@ import styles from './index.less';
 import { Button, Input } from 'antd';
 import { SearchOutlined, PlusOutlined } from '@ant-design/icons';
 import ArticleDataList from '@/components/ArticleDataList';
+import { history } from 'umi';
 
-export default function SolutionsComments() {
+export default function SolutionsComments(props: { question_id: number }) {
+  const { question_id } = props;
+  function goToCreateArticle() {
+    history.push(`/create-article?id=${question_id}`);
+  }
+
   return (
     <div className={styles.mainContainer}>
       <div className={styles.headerContainer}>
@@ -11,10 +17,15 @@ export default function SolutionsComments() {
           <Button type="primary" shape="circle" icon={<SearchOutlined />} />
           <Input placeholder="请输入搜索内容" bordered={false} />
         </div>
-        <Button type="primary" shape="circle" icon={<PlusOutlined />} />
+        <Button
+          type="primary"
+          shape="circle"
+          icon={<PlusOutlined />}
+          onClick={goToCreateArticle}
+        />
       </div>
       <div className={styles.solutionsContainer}>
-        <ArticleDataList isPagination={true} />
+        <ArticleDataList isPagination={true} question_id={question_id} />
       </div>
     </div>
   );

@@ -50,7 +50,6 @@ export default function DailyCalendar(props: {
             item.question_id === newItem.question_id && newItem.state === 1,
         );
         if (res !== undefined) {
-          console.log(res);
           return true;
         }
       }

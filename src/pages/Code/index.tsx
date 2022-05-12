@@ -106,7 +106,7 @@ export default function Code(props: any) {
         setMenuComponent(<QuestionText questionInfo={questionInfo} />);
         break;
       case 'solutions':
-        setMenuComponent(<SolutionsComments />);
+        setMenuComponent(<SolutionsComments question_id={question_id} />);
         break;
       case 'history':
         setMenuComponent(
@@ -146,7 +146,6 @@ export default function Code(props: any) {
       <SubmissionHistory question_id={question_id} judgeLoading={true} />,
     );
     setJudgeLoading(true);
-    console.log(codeConent);
     const res = await request.post('/judgeCode', {
       data: {
         question_id,
@@ -161,7 +160,6 @@ export default function Code(props: any) {
     } else if (res.code === 200) {
       setJudgeRes(res.data.result);
       const result = judgeReutrn(res.data.result);
-      console.log(res.data.result);
       if (result.res) {
         message.success(result.status);
       } else {

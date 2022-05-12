@@ -19,6 +19,7 @@ import { useAtom } from 'jotai';
 import request from '@/utils/request';
 import { clearLocalStorage } from '@/utils/dataHandle';
 import { history } from 'umi';
+import moment from 'moment';
 
 function getBase64(img: any, callback: Function) {
   const reader = new FileReader();
@@ -94,6 +95,7 @@ export default function Personal(props: any) {
       });
       if (subRes.code === 200) {
         setSubmitArr(subRes.data.res);
+        console.log(subRes.data.res);
       } else if (subRes.code >= 400) {
         message.error(subRes.msg);
       }
@@ -171,6 +173,12 @@ export default function Personal(props: any) {
     }
   };
 
+  const weekData = [0, 0, 0, 0, 0, 0, 0];
+  submitArr.forEach((item) => {
+    const date = moment(item.date).weekday();
+    weekData[date]++;
+  });
+
   // 图一
   const optionChartsOne = {
     width: '360px',
@@ -196,7 +204,7 @@ export default function Personal(props: any) {
       },
       series: [
         {
-          data: [120, 200, 150, 80, 70, 110, 130],
+          data: [...weekData],
           type: 'bar',
         },
       ],
@@ -345,7 +353,7 @@ export default function Personal(props: any) {
       <div className={styles.rightContainer}>
         <div className={styles.CalendarContainer}>
           <p className={styles.CalendarTitle}>每日记录</p>
-          <CalendarCard />
+          <CalendarCard submitArr={submitArr} />
         </div>
         <div className={styles.chartContainer}>
           <div className={styles.chartOne}>

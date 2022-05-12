@@ -21,8 +21,9 @@ export default function ArticleList() {
   const [selectTagsArr, setSelectTagsArr] = useState<ArticleTags[]>([]);
   const [tagsArr, setTagsArr] = useState<ArticleTags[]>([]);
   const [originTags, setOriginTags] = useState<ArticleTags[]>([]);
+  const [searchRecordTags, setSearchRecordTags] = useState<ArticleTags[]>([]);
   // 展示tag数目
-  const [maxTagsNumber, setMaxTagsNumber] = useState(15);
+  const [maxTagsNumber, setMaxTagsNumber] = useState(10);
 
   useEffect(() => {
     async function firstLoad() {
@@ -43,6 +44,9 @@ export default function ArticleList() {
     let newArr = [{ tags_name: text }, ...selectTagsArr];
     setSelectTagsArr(newArr);
     setTagsArr(tagsArr.filter((tag) => tag.tags_name !== text));
+    setSearchRecordTags(
+      searchRecordTags.filter((tag) => tag.tags_name !== text),
+    );
     filterArticleObj.filterArticleFn(newArr);
   };
 
@@ -68,21 +72,29 @@ export default function ArticleList() {
   };
   // 加载更多标签
   const addMoreTags = () => {
-    if (maxTagsNumber >= 45) {
+    if (maxTagsNumber >= 40) {
       message.error('请采用搜索方式查询标签');
     } else {
-      setMaxTagsNumber((pre) => pre + 15);
+      setMaxTagsNumber((pre) => pre + 10);
     }
   };
 
   const onChangeMentions = (e: any) => {
-    console.log(e);
     setMentionValue(e);
+    if (e === '' && searchRecordTags.length !== 0) {
+      setTagsArr(searchRecordTags);
+    }
   };
 
   const onSelectMentions = (e: any) => {
-    console.log(e);
+    setTagsArr(originTags.filter((item) => item.tags_name === e.value));
+    setSearchRecordTags(tagsArr);
     setMentionValue(e.value);
+  };
+
+  const searchTags = () => {
+    setTagsArr(originTags.filter((item) => item.tags_name === mentionValue));
+    setSearchRecordTags(tagsArr);
   };
 
   // 禁止换行
@@ -123,7 +135,7 @@ export default function ArticleList() {
           })}
         </div>
         <div className={styles.searchTags}>
-          <SearchOutlined className={styles.searchIcon} />
+          <SearchOutlined className={styles.searchIcon} onClick={searchTags} />
           <Mentions
             onChange={onChangeMentions}
             onSelect={onSelectMentions}

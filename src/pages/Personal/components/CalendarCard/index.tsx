@@ -1,9 +1,15 @@
-import { getMonthRecent } from '@/utils/date';
+import { getMonthRecent, monthName } from '@/utils/date';
 import Konva from 'konva';
 import { Stage, Layer, Rect, Text } from 'react-konva';
 import styles from './index.less';
+import moment from 'moment';
+import * as _ from 'lodash';
 
-export default function CalendarCard() {
+export default function CalendarCard(props: {
+  submitArr: QuestionSubmissionHistory[];
+}) {
+  const { submitArr } = props;
+  console.log(submitArr);
   const { year, date, monthNames, monthDays } = getMonthRecent(12);
   const colorMessageArr = [
     'rgb(201, 209, 217)',
@@ -80,6 +86,40 @@ export default function CalendarCard() {
     }
   };
 
+  const dateMap = new Map();
+  submitArr.forEach((item) => {
+    const date = moment(item.date).format('YYYY-MM-DD');
+    if (dateMap.has(date)) {
+      dateMap.set(date, dateMap.get(date) + 1);
+    } else {
+      dateMap.set(date, 1);
+    }
+  });
+  // 获取当前方块日期
+  function getDate(year: number, month: string, day: number) {
+    let monthStr = _.padStart(
+      (monthName.indexOf(month) + 1).toString(),
+      2,
+      '0',
+    );
+    let dayStr = _.padStart(day.toString(), 2, '0');
+    return `${year}-${monthStr}-${dayStr}`;
+  }
+  // 获取当前方块颜色
+  function getColor(num: number) {
+    if (num === 0) {
+      return colorMessageArr[0];
+    } else if (num >= 1 && num <= 2) {
+      return colorMessageArr[1];
+    } else if (num >= 2 && num <= 3) {
+      return colorMessageArr[2];
+    } else if (num >= 4 && num <= 5) {
+      return colorMessageArr[3];
+    } else {
+      return colorMessageArr[4];
+    }
+  }
+
   return (
     <div className={styles.mainContainer}>
       <div className={styles.calendar}>
@@ -113,7 +153,15 @@ export default function CalendarCard() {
                     key={i}
                     x={xIndex}
                     y={yIndex}
-                    color={i % index === 0 ? 'rgb(201, 209, 217)' : 'green'}
+                    color={getColor(
+                      dateMap.has(
+                        getDate(year[index], monthNames[index], i + 1),
+                      )
+                        ? dateMap.get(
+                            getDate(year[index], monthNames[index], i + 1),
+                          )
+                        : 0,
+                    )}
                     width={rectWidth}
                     height={rectHeight}
                     name={`x Submit on ${monthNames[index]} ${i + 1}, ${

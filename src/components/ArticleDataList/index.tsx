@@ -19,9 +19,10 @@ const IconText = (props: { icon: any; text: string }) => (
 export default function ArticleDataList(props: {
   isPagination: boolean;
   scrollDom?: any;
+  question_id?: number;
 }) {
   const [, setFilterArticleFn] = useAtom(filterArticleFnAtom);
-  const { isPagination, scrollDom } = props;
+  const { isPagination, scrollDom, question_id } = props;
   const [maxArticleNumber, setMaxArticleNumber] = useState(15);
   const [listData, setListData] = useState<ArticleData[]>([]);
   const [originListData, setOriginListData] = useState<ArticleData[]>([]);
@@ -29,16 +30,31 @@ export default function ArticleDataList(props: {
   function handleArticleData(data: any) {
     const newData: ArticleData[] = [];
     data.article.forEach((item: any, index: number) => {
-      newData.push({
-        id: item.article_id,
-        title: item.article_title,
-        avatar: process.env.BASE_URL + item.author_img,
-        content: mdToNormalString(item.article_content),
-        likes: data.likesNum[index],
-        comments: data.commentsNum[index],
-        img: item.img === null ? null : process.env.BASE_URL + item.img,
-        tags: data.tags[index],
-      });
+      if (question_id !== undefined) {
+        if (Number(item.question_id) === question_id) {
+          newData.push({
+            id: item.article_id,
+            title: item.article_title,
+            avatar: process.env.BASE_URL + item.author_img,
+            content: mdToNormalString(item.article_content),
+            likes: data.likesNum[index],
+            comments: data.commentsNum[index],
+            img: item.img === null ? null : process.env.BASE_URL + item.img,
+            tags: data.tags[index],
+          });
+        }
+      } else {
+        newData.push({
+          id: item.article_id,
+          title: item.article_title,
+          avatar: process.env.BASE_URL + item.author_img,
+          content: mdToNormalString(item.article_content),
+          likes: data.likesNum[index],
+          comments: data.commentsNum[index],
+          img: item.img === null ? null : process.env.BASE_URL + item.img,
+          tags: data.tags[index],
+        });
+      }
     });
     setListData(newData);
     setOriginListData(newData);

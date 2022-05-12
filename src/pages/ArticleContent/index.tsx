@@ -16,7 +16,7 @@ import {
   MessageFilled,
   LockOutlined,
 } from '@ant-design/icons';
-import { useState, useRef, useEffect, useCallback } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import MarkdownPreview from '@uiw/react-markdown-preview';
 import moment from 'moment';
 import request from '@/utils/request';
@@ -127,58 +127,64 @@ export default function ArticleContent(props: any) {
 
     SetComments(resComments);
   }
+  useEffect(() => {
+    async function firstLoad() {
+      let uuid;
+      if (userInfo.uuid === null) {
+        uuid = undefined;
+      } else {
+        uuid = userInfo.uuid;
+      }
+      // 文章请求
+      const articeRes = await request.get('/getArticleByID', {
+        params: {
+          article_id: article_id,
+          uuid,
+        },
+      });
+      const articleData = articeRes.data.article;
+      const tagsData = articeRes.data.tags;
+      const likesNumber = articeRes.data.likes;
+      const isLike = articeRes.data.isLike;
+      const comments = articeRes.data.comments;
 
-  async function firstRequestFn() {
-    let uuid;
-    if (userInfo.uuid === null) {
-      uuid = undefined;
+      if (articeRes.code >= 400) {
+        message.error(articeRes.msg);
+        return;
+      } else if (articeRes.code === 200) {
+        SetArticle(articleData);
+        SetTags(tagsData);
+        SetIsLike(isLike);
+        SetLikesNumber(likesNumber);
+        SetOriginComments(comments);
+        handleComments(comments);
+      }
+      // 用户请求
+      const userRes = await request.get('/getUserInfo', {
+        params: {
+          uuid: articleData.author_id,
+        },
+      });
+      const userData = userRes.data.user;
+      if (userRes.code >= 400) {
+        message.error(userRes.msg);
+        return;
+      } else if (userRes.code === 200) {
+        SetAuthor(userData);
+      }
+    }
+    firstLoad();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // 跳转至题目页面
+  async function goToCodePage() {
+    if (article !== undefined) {
+      history.push(`/code/${article.question_id}`);
     } else {
-      uuid = userInfo.uuid;
-    }
-    // 文章请求
-    const articeRes = await request.get('/getArticleByID', {
-      params: {
-        article_id: article_id,
-        uuid,
-      },
-    });
-    const articleData = articeRes.data.article;
-    const tagsData = articeRes.data.tags;
-    const likesNumber = articeRes.data.likes;
-    const isLike = articeRes.data.isLike;
-    const comments = articeRes.data.comments;
-
-    if (articeRes.code >= 400) {
-      message.error(articeRes.msg);
-      return;
-    } else if (articeRes.code === 200) {
-      SetArticle(articleData);
-      SetTags(tagsData);
-      SetIsLike(isLike);
-      SetLikesNumber(likesNumber);
-      SetOriginComments(comments);
-      handleComments(comments);
-    }
-    // 用户请求
-    const userRes = await request.get('/getUserInfo', {
-      params: {
-        uuid: articleData.author_id,
-      },
-    });
-    const userData = userRes.data.user;
-    if (userRes.code >= 400) {
-      message.error(userRes.msg);
-      return;
-    } else if (userRes.code === 200) {
-      SetAuthor(userData);
+      history.push(`/home`);
     }
   }
-
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  const firstRequestCBFn = useCallback(firstRequestFn, [article_id, userInfo]);
-  useEffect(() => {
-    firstRequestCBFn();
-  }, [firstRequestCBFn]);
 
   // 给文章点赞或取消点赞
   async function likeArticleOrNot() {
@@ -307,6 +313,7 @@ export default function ArticleContent(props: any) {
           icon={<RollbackOutlined />}
           type="primary"
           style={{ display: article?.question_id ? 'block' : 'none' }}
+          onClick={goToCodePage}
         >
           前往题目页面
         </Button>
