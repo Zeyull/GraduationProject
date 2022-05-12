@@ -56,11 +56,13 @@ class ArticleController{
      * @param {string} tags 文章标签
      * @param {Blob} file 图片封面
      * @param {string} author_img 作者头像
+     * @param {number} question_id 问题ID
      * @returns {article_id:number} 新创建的文章字段信息
      */
     async createArticle(ctx: Context){
         // 普通数据校验
         const data = ctx.request.body;
+        const question_id = data.question_id === undefined ? null : Number(data.question_id);
         const rules:Rules = {
             article_title:articleTitleRules,
             time:timeRules,
@@ -78,7 +80,7 @@ class ArticleController{
         if(error !== null){
             return response.error(ctx,error,{},400);
         }
-        if(data.tags === ""){
+        if(data.tags === "[]"){
             return response.error(ctx,"每个文章至少一个标签",{},400);
         }
         const recordArticle = await ArticleService.getArticleByTitle(data.article_title);
@@ -110,6 +112,7 @@ class ArticleController{
                 article_content:data.article_content,
                 author_id:Number(data.author_id),
                 author_img:data.author_img,
+                question_id,
                 img:filePath
             });
             response.success(ctx,{article_id:res.article_id},'文章创建成功',200);
@@ -121,6 +124,7 @@ class ArticleController{
                 article_content:data.article_content,
                 author_id:Number(data.author_id),
                 author_img:data.author_img,
+                question_id,
             });
             response.success(ctx,{article_id:res.article_id},'文章创建成功',200);
             newArticleID = res.article_id;

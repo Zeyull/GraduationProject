@@ -1,7 +1,7 @@
 import Question from '../model/Question';
 import UserQuestion from '../model/UserQuestion';
 import DailyQuestion from '../model/DailyQuestion';
-import sequelize from '../db/index';
+import Article from '../model/Article';
 
 class QuestionService{
     async getQuestionByID(question_id:number){
@@ -24,7 +24,7 @@ class QuestionService{
         return UserQuestion.findAll({where: {uuid,question_id}})
     }
     async getQuestionSolutionsByID(question_id:number){
-        return UserQuestion.count({where: {question_id}});
+        return Article.count({where: {question_id}});
     }
     async createUserQuestion(data:any){
         return UserQuestion.create(data);

@@ -6,7 +6,7 @@ export  interface ArticleType{
     author_id:number,
     like?:number,
     img?:string|null,
-    question_id?:number,
+    question_id?:number|null,
     author_img:string
 }
 
