@@ -1,5 +1,5 @@
 export function clearLocalStorage() {
-  const items = ['token', 'userInfoAtom'];
+  const items = ['token'];
   items.forEach((item) => {
     localStorage.removeItem(item);
   });

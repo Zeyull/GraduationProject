@@ -49,7 +49,7 @@ request.interceptors.request.use((url: string, options: RequestOptionsInit) => {
   const token = localStorage.getItem('token');
   if (token !== null) {
     const headers = {
-      Authorization: `Bearer ${token}`,
+      Authorization: `${token}`,
     };
     return {
       url,

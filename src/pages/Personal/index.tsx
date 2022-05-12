@@ -14,7 +14,7 @@ import {
   LogoutOutlined,
   RightOutlined,
 } from '@ant-design/icons';
-import { userInfoAtom } from '@/jotai';
+import { userInfoAtom, defaultUserInfo } from '@/jotai';
 import { useAtom } from 'jotai';
 import request from '@/utils/request';
 import { clearLocalStorage } from '@/utils/dataHandle';
@@ -277,6 +277,7 @@ export default function Personal(props: any) {
       break;
     case 'out':
       clearLocalStorage();
+      setUserInfo(defaultUserInfo);
       history.push('/home');
       location.reload();
       break;

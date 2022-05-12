@@ -1,6 +1,6 @@
 import { atomWithStorage } from 'jotai/utils';
 
-const defaultUserInfo: UserInfo = {
+export const defaultUserInfo: UserInfo = {
   uuid: null,
   head_img: '/default/unLoginImg.png',
   city: '浙江/杭州',

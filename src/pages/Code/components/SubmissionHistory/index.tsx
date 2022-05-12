@@ -62,7 +62,6 @@ export default function SubmissionHistory(props: {
         },
       });
       if (res.code >= 400) {
-        console.log(res.data);
         message.error('获取题目提交历史记录请求错误');
       } else if (res.code === 200) {
         setTableData(res.data.list);
