@@ -105,7 +105,7 @@ export function judgeReutrn(info: any) {
   } else {
     const msgErr =
       info.statistic_info.err_info === undefined
-        ? `${status} 运行时间共${info.statistic_info.time_cost}ms 占用空间共${
+        ? `运行时间共${info.statistic_info.time_cost}ms 占用空间共${
             info.statistic_info.memory_cost / 1024
           }KB`
         : '，错误信息:' + info.statistic_info.err_info.replace(/\n/g, `\\n`);

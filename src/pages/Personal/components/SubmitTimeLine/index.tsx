@@ -15,53 +15,55 @@ export default function SubmitTimeLine(props: {
         {submitArr.length === 0 ? (
           <Empty />
         ) : (
-          submitArr.map((item, index) => {
-            return (
-              <Timeline.Item
-                key={index}
-                dot={
-                  item.state === 1 ? (
-                    <CheckCircleOutlined
-                      style={{ fontSize: '18px', color: '#00B42A' }}
-                    />
-                  ) : (
-                    <CloseCircleOutlined
-                      style={{ fontSize: '18px', color: '#CB2634' }}
-                    />
-                  )
-                }
-                position={item.state === 1 ? 'left' : 'right'}
-              >
-                <Card
-                  title={
-                    <div className={styles.cardTitle}>
-                      {item.state === 1 ? (
-                        <>
-                          <LevelTag level={item.level} />
-                          <span className={styles.questionText}>
-                            {item.question_index}. {item.question_name}{' '}
-                          </span>
-                        </>
-                      ) : (
-                        <>
-                          <span className={styles.questionText}>
-                            {item.question_index}. {item.question_name}{' '}
-                          </span>
-                          <LevelTag level={item.level} />
-                        </>
-                      )}
-                    </div>
+          submitArr
+            .sort((a, b) => (a.date > b.date ? -1 : 1))
+            .map((item, index) => {
+              return (
+                <Timeline.Item
+                  key={index}
+                  dot={
+                    item.state === 1 ? (
+                      <CheckCircleOutlined
+                        style={{ fontSize: '18px', color: '#00B42A' }}
+                      />
+                    ) : (
+                      <CloseCircleOutlined
+                        style={{ fontSize: '18px', color: '#CB2634' }}
+                      />
+                    )
                   }
-                  hoverable={true}
+                  position={item.state === 1 ? 'left' : 'right'}
                 >
-                  <p className={styles.timeText}>
-                    提交时间: {moment(item.date).format('YYYY-MM-DD HH:mm')}{' '}
-                  </p>
-                  <p className={styles.timeText}>耗时: {item.time}ms</p>
-                </Card>
-              </Timeline.Item>
-            );
-          })
+                  <Card
+                    title={
+                      <div className={styles.cardTitle}>
+                        {item.state === 1 ? (
+                          <>
+                            <LevelTag level={item.level} />
+                            <span className={styles.questionText}>
+                              {item.question_index}. {item.question_name}{' '}
+                            </span>
+                          </>
+                        ) : (
+                          <>
+                            <span className={styles.questionText}>
+                              {item.question_index}. {item.question_name}{' '}
+                            </span>
+                            <LevelTag level={item.level} />
+                          </>
+                        )}
+                      </div>
+                    }
+                    hoverable={true}
+                  >
+                    <p className={styles.timeText}>
+                      提交时间: {moment(item.date).format('YYYY-MM-DD HH:mm')}{' '}
+                    </p>
+                    <p className={styles.timeText}>耗时: {item.time}ms</p>
+                  </Card>
+                </Timeline.Item>
+              );
+            })
         )}
       </Timeline>
       <div className={styles.endText}>End</div>

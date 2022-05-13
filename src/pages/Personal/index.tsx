@@ -185,7 +185,7 @@ export default function Personal(props: any) {
     height: '310px',
     options: {
       title: {
-        text: '每周题目总记录',
+        text: '周题目总记录',
         bottom: '5%',
         left: '50%',
         textAlign: 'center',

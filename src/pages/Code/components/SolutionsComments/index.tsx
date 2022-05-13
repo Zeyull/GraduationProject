@@ -14,8 +14,12 @@ export default function SolutionsComments(props: { question_id: number }) {
     <div className={styles.mainContainer}>
       <div className={styles.headerContainer}>
         <div className={styles.searchContainer}>
-          <Button type="primary" shape="circle" icon={<SearchOutlined />} />
-          <Input placeholder="请输入搜索内容" bordered={false} />
+          {/* <Button type="primary" shape="circle" icon={<SearchOutlined />} /> */}
+          <Input
+            placeholder="点击右侧编写新题解"
+            bordered={false}
+            readOnly={true}
+          />
         </div>
         <Button
           type="primary"

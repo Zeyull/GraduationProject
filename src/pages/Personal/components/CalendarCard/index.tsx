@@ -164,9 +164,15 @@ export default function CalendarCard(props: {
                     )}
                     width={rectWidth}
                     height={rectHeight}
-                    name={`x Submit on ${monthNames[index]} ${i + 1}, ${
-                      year[index]
-                    }`}
+                    name={`${
+                      dateMap.has(
+                        getDate(year[index], monthNames[index], i + 1),
+                      )
+                        ? dateMap.get(
+                            getDate(year[index], monthNames[index], i + 1),
+                          )
+                        : 0
+                    } Submit on ${monthNames[index]} ${i + 1}, ${year[index]}`}
                   />,
                 );
                 flag++;

@@ -174,17 +174,17 @@ export default function CreateArticle(props: any) {
     if (question_id !== undefined) {
       form.append('question_id', question_id);
     }
-    // const res = await request.post('/createArticle', {
-    //   requestType: 'form',
-    //   headers: { 'Content-Type': 'multipart/form-data' },
-    //   data: form,
-    // });
-    // if (res.code >= 400) {
-    //   message.error(res.msg);
-    // } else if (res.code === 200) {
-    //   message.success(res.msg);
-    //   history.push(`/article-content/${res.data.article_id}`);
-    // }
+    const res = await request.post('/createArticle', {
+      requestType: 'form',
+      headers: { 'Content-Type': 'multipart/form-data' },
+      data: form,
+    });
+    if (res.code >= 400) {
+      message.error(res.msg);
+    } else if (res.code === 200) {
+      message.success(res.msg);
+      history.push(`/article-content/${res.data.article_id}`);
+    }
   }
 
   // 离开后保存草稿

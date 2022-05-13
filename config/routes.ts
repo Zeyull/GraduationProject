@@ -22,7 +22,7 @@ export default [
       {
         path: '/article-content/:id',
         component: './ArticleContent',
-        title: 'xxx文章',
+        title: '文章内容',
       },
       { path: '/front-code', component: './FrontCode', title: '前端练习' },
       {

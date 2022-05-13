@@ -64,7 +64,11 @@ export default function SubmissionHistory(props: {
       if (res.code >= 400) {
         message.error('获取题目提交历史记录请求错误');
       } else if (res.code === 200) {
-        setTableData(res.data.list);
+        setTableData(
+          res.data.list.sort((a: any, b: any) => {
+            return b.date > a.date ? 1 : -1;
+          }),
+        );
       }
     }
     firstLoad();
