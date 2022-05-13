@@ -11,7 +11,7 @@
  Target Server Version : 80028
  File Encoding         : 65001
 
- Date: 10/05/2022 22:28:08
+ Date: 14/05/2022 00:48:18
 */
 
 SET NAMES utf8mb4;
@@ -29,10 +29,10 @@ CREATE TABLE `Article` (
   `author_id` int DEFAULT NULL,
   `like` int DEFAULT '0',
   `img` varchar(255) DEFAULT NULL,
-  `question_id` varchar(16) DEFAULT NULL,
+  `question_id` int DEFAULT NULL,
   `author_img` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`article_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=38 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=44 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of Article
@@ -43,6 +43,11 @@ INSERT INTO `Article` (`article_id`, `article_title`, `article_content`, `time`,
 INSERT INTO `Article` (`article_id`, `article_title`, `article_content`, `time`, `author_id`, `like`, `img`, `question_id`, `author_img`) VALUES (35, '分析比较 opacity: 0、visibility: hidden、display: none', '从结构上来讲：\r\n\r\n- display:none **会**让元素完全从渲染树中消失，渲染的时候不占据任何空间, 不能点击\r\n- visibility:hidden**不会**让元素完全从渲染树中消失，渲染的时候不占据任何空间, 不能点击\r\n- opacity:0 **不会**让元素从渲染树消失，渲染元素继续占据空间，只是内容不可见，可以点击(透明度)\r\n- （渲染树？）\r\n\r\n从继承上来讲：\r\n\r\n- display:none是**非继承属性**，子孙结点的消失是由于该元素从渲染数消失造成的，通过修改子孙结点属性仍无法显示\r\n- visibility:hidden是**继承属性**，子孙节点消失由于继承了hidden，通过设置visibility: visible可以让子孙节点显式。\r\n- opacity:0是**继承属性**，且子孙结点无法通过修改opacity来改变这个继承属性。父节点可以通过rgba间接设定opacity的值，这个不会向下继承；或者把opacity属性放到同级元素实现透明\r\n\r\n从性能方面来讲：\r\n\r\n- display:none修改元素会造成文档**回流**，性能消耗较大，读屏器不会读取display:none元素内容\r\n- visibility:hidden修改元素只会造成元素本身**重绘**，性能消耗较少，读屏器会读取visibility:hidden元素内容\r\n- opacity:0修改元素造成**重绘**，性能消耗较少，读屏器会读取opacity:0元素内容\r\n\r\n共同特点：它们都能让元素不可见\r\n\r\n参考文章：\r\n\r\n- CSS魔法堂：display:none和visiblity:hidden的恩怨情仇 https://segmentfault.com/a/1190000016570003', '2022-05-08 13:06:10', 6, 0, '/upload/articleImages/8e7feee8ff9a5f9bd725d0c1c57d655e.png', NULL, '/upload/headerImage/f8648190c4fd95c48c278fdd30c3939b.png');
 INSERT INTO `Article` (`article_id`, `article_title`, `article_content`, `time`, `author_id`, `like`, `img`, `question_id`, `author_img`) VALUES (36, '如何使集群共享session且稳定？', '先说说方法：\r\n\r\n1. 找一块公共地方来存储session，而不是将session存储在集群节点的某个服务器上，这样每一台服务器都能访问这块空间，实现session共享\r\n2. 每台服务器仍存储session，不做修改，但采取另外一种同步机制，实时同步每一台服务器的session信息\r\n\r\n具体实现方案：\r\n\r\n1.持久化session到数据库，即使用数据库来储存session。数据库正好是我们普遍使用的公共储存空间，一举两得，推荐使用mysql数据库，轻量并且性能良好。\r\n\r\n**优点：**就地取材，符合大多数人的思维，使用简单，不需要太多额外编码工作。\r\n\r\n**缺点：**对mysql性能要求较高，访问mysql需要从连接池中获取连接，又因为大部分请求均需要进行登录鉴权，所以**操作数据库非常频繁，当用户量达到一定程度之后，极易造成数据库瓶颈，不适用于处理高并发的情况。**\r\n\r\n2.用redis共享session。redis是一个key-value的储存系统。可以简单的将其理解为一个数据库，与传统数据库的区别是，它将数据储存于内存中，并自带有内存到硬盘的序列化策略，即按策略将内存中的数据同步到磁盘，避免数据丢失，是目前比较流行的解决方案。\r\n\r\n**优点：无需增加数据库的压力，因为数据存储于内存中，所以读取非常快，高性能，并能处理多种类型的数据。**\r\n\r\n**缺点：**额外增加一些编码，以便操作redis。\r\n\r\n3.使用Cookie共享session。此方案可以说是独辟蹊径了，将分布式思想用到了极致。如上文分析所说，session-cookie机制中，session与cookie相互关联，以cookie做中转站，用来找到对应的session，其中session存放在服务器。那么如果将session中的内容存放在cookie中呢，那么则省略了服务器保存session的过程，后台只需要根据cookie中约定的标识进行鉴权校验即可。\r\n\r\n**优点：**完美的贯彻分布式的理念，将每个用户都利用起来，无需耗费额外的服务器资源；\r\n\r\n**缺点：**受http协议头长度限制，cookie中存储的信息不宜过多；为了保持cookie全局有效，所以其一般依赖在根域名下，所以基本上所有的http请求都需要传递cookie中的这些标记信息，所以会占用一些服务器的带宽；鉴权信息全存储于cookie中，cookie存在于客户端，服务器并没有储存相关信息，cookie存在着泄露的可能，或则其他人揣摩出规则后可以进行伪装，其安全性比其他方案差，故需要对cookie中信息进行加密解密，来增强其安全性。 \r\n\r\n4.使用memcache同步session，memcache可以实现分布式，可将服务器中的内存组合起来，形成一个“内存池”，以此充当公共空间，保存session信息。\r\n\r\n**优点：**数据储存在内存中，读取非常快，性能好；\r\n\r\n**缺点：**memcache把内存分成很多种规格的存储块，有大有小，不能完全利用内存，会产生内存碎片，浪费资源，如果储存块不足，还会产生内存溢出。\r\n\r\n', '2022-05-10 09:04:33', 9, 0, '/upload/articleImages/070bce53cf33ef251392ad17758417b0.jpeg', NULL, '/default/unLoginImg.png');
 INSERT INTO `Article` (`article_id`, `article_title`, `article_content`, `time`, `author_id`, `like`, `img`, `question_id`, `author_img`) VALUES (37, '编译性语言和解释性语言', '高级语言若想被计算机执行，都必须将其转换为计算机语言，也就是机器码。而转换的方式有两种：\r\n\r\n**编译**与**解释**\r\n\r\n所以高级语言也分为**编译型语言（C C++）和解释性语言（Python JS）** \r\n\r\n> JS是脚本语言，脚本语言不需要编译，是由js解释器逐行解释并执行的\r\n\r\n**主要区别在于，前者源程序编译后即可在该平台运行，后者是在运行期间才编译。所以前者运行速度快，后者跨平台性好。**\r\n\r\n**编译性语言**\r\n\r\n特点：\r\n\r\n在编译型语言写的程序执行之前，**需要一个专门的编译过程，把源代码编译成机器语言的文件，如exe格式的文件，以后要再运行时，直接使用编译结果即可**，如直接运行exe文件。**因为只需编译一次，以后运行时不需要编译，所以编译型语言执行效率高。**\r\n\r\n总结：\r\n\r\n1.一次性的编译成平台相关的机器语言文件，**运行时脱离开发环境，运行效率高**；\r\n\r\n2.与特定平台相关，一般无法移植到其他平台；\r\n\r\n**解释性语言**\r\n\r\n特点：\r\n\r\n解释型语言**不需要事先编译，其直接将源代码解释成机器码并立即执行**，所以只要**某一平台提供了相应的解释器即可运行该程序。**\r\n\r\n总结：\r\n\r\n1.解释型语言每次运行都需要将源代码解释成机器码并执行，**效率较低**；\r\n\r\n2.只要平台提供相应的解释器，就可以运行源代码，所以可以**方便源程序移植**；\r\n\r\n**两者各有利弊**\r\n\r\n前者由于**程序执行速度快，同等条件下对系统要求较低**，因此像**开发操作系统、大型应用程序、数据库系统**等时都采用它\r\n\r\n而一些网页脚本、服务器脚本及辅助开发接口这样的**对速度要求不高、对不同系统平台间的兼容性有一定要求**的程序则通常使用解释性语言\r\n\r\n> JAVA即是编译的，也是解释的。非要归类的话，从概念上来讲，应该会定义到解释性语言中\r\n>\r\n> JAVA先编译，但编译后不能直接运行，要通过JVM来解释运行，所以是解释语言（但现在的JVM有一些有JIT优化，它又会把.class的二进制代码编译为本地的代码直接运行，就又是编译语言了）\r\n\r\n', '2022-05-10 09:21:26', 9, 0, '/upload/articleImages/ada3ade1163dcdcf20a3f192de642392.jpeg', NULL, '/default/unLoginImg.png');
+INSERT INTO `Article` (`article_id`, `article_title`, `article_content`, `time`, `author_id`, `like`, `img`, `question_id`, `author_img`) VALUES (38, '关于两数之和的解答方法', '### 网页加载慢，如何进行前端的性能优化\r\n\r\n答5点\r\n\r\n**减少HTTP请求次数**，每次HTTP请求都有成本的，既包含时间成本也包含资源成本。另外浏览器进行并发请求的请求数量是有上限的，请求数增多，浏览器会进行分批次请求。如何实现减少HTTP请求呢？\r\n\r\n1. 从设计层面简化页面，保持页面简洁，减少资源是最直接的方法\r\n2. 设置合理的HTTP缓存。对于很少变化的图片资源可以设置很长的过期时间，对于变化不频繁的资源可以使用Last-Modified或者E-tag进行验证，尽可能让资源在缓存中呆的久一点\r\n3. 资源的合并与压缩，尽量把外部脚本、样式进行合并，多个合为一个。响应的图片、视频、JS文件、CSS文件都可以使用相应的工具压缩\r\n4. 使用CSS 精灵图 CSS Sprites，合并CSS请求的图片，是减少请求次数的一个好办法，background-position\r\n5. 使用懒加载图片，这种情况下能减少页面初始化时HTTP请求数，只有在用户向下滚动屏幕时才会再次请求加载\r\n6. 使用更高版本的HTTP，在HTTP2中会采用多路复用，浏览器推送等优化机制\r\n\r\n**在渲染页面时的优化**\r\n\r\n解析html时，遇到一些链接资源，会单独发起网络请求去下载资源\r\n\r\n1. 对于CSS资源，虽然下载时异步，不会阻止浏览器构建DOM树，但是会阻塞渲染，在构建render树时，要等待CSS下载完毕后才执行（这里是浏览器自带的优化，避免了重复构建），但声明了media query的CSS不会阻塞渲染（下方专门针对CSS与渲染页面写了）\r\n2. 对于JS资源，会阻塞浏览器的解析，只有等待脚本下载完并执行后才会继续解析HTML，但加上了async和defer后，脚本就变成异步的了，可以等HTML解析完毕后再执行\r\n\r\n> defer和async是有区别的： **defer是延迟执行，而async是异步执行。**但只要是**JS执行，就会暂停HTML解析**\r\n>\r\n> - `async`是异步执行，异步下载完毕后就会执行，不确保执行顺序，一定在`onload`前，但不确定在`DOMContentLoaded`事件的前或后\r\n> - `defer`是延迟执行，在浏览器看起来的效果像是将脚本放在了`body`后面一样，等待HTML解析完毕后才执行脚本（虽然按规范应该是在`DOMContentLoaded`事件前，但实际上不同浏览器的优化效果不一样，也有可能在它后面）\r\n\r\n合理利用光栅线程和合成线程的机制，这里涉及浏览器相关知识\r\n\r\n**通过原生JS的技巧来进行性能优化**\r\n\r\n1. 在JS代码解析过程中减少**回流和重绘**，每次回流和重绘会造成额外的计算消耗，通过减少回流和重绘，可以提升页面性能\r\n   1. 最小化重绘和回流，多次修改CSS样式可以改成采用cssText和修改css class；\r\n   2. 批量修改DOM，先让DOM脱离文档流，对其进行多次修改，再将元素带回到文档流中。如隐藏文档，拷贝文档\r\n   3. 使用CSS3硬件加速（GPU加速），让一些动画不会引起回流和重绘\r\n   4. 使用虚拟DOM，虚拟DOM不会立即操作DOM，而是将这10次更新的diff内容保存到本地一个JS对象中，最终将这个JS对象一次性attch到DOM树上，再进行后续操作，避免大量无谓的计算量。\r\n2. **事件委托**，通过事件委托减少内存消耗，因为访问的DOM减少了，设置事件处理程序所需时间更少, 加快了整个页面的交互就绪时间，还可以动态绑定事件，减少重复的工作。使用事件委托时注意**非快速滚动区**\r\n\r\n**使用CDN加速**，能够使用户就近获取所需内容，降低网络拥塞，提高用户访问响应速度和命中率，就算一个服务器或者源服务器宕机了，还有其他CDN缓存服务器可以提供资源。\r\n\r\n​	如何做到加速的呢？CDN 网站的内容缓存在网络边缘。不同地区的用户就会访问到离自己最近的相同网络线路上的CDN节点。当请求达到CDN节点后，节点会判断自己的内容缓存是否有效，如果有效，则立即响应缓存内容给用户，从而加快响应速度。\r\n\r\n​	CDN是在DNS解析的过程中起作用的，当给一个域名开通了CDN，要先给**这个域名的DNS解析设置的后台**添加一条CDN专用的解析记录，这条解析记录会让域名被解析后指向**一个CDN网络专用的处理DNS请求的服务器**，这个CDN专用的处理DNS请求的服务器会给浏览器返回**一台专门用来给各个请求分配合适CDN服务器的服务器的IP**地址，这种服务器叫负载均衡系统服务器。然后浏览器就会去访问这台负载均衡系统浏览器，负载均衡服务器会根据你浏览器的网络地址，在CDN网络中找**一台在各种条件下都比较适合给你设备提供服务的服务器**，将这个服务器的IP返回给你的浏览器，那么浏览器在收到这个IP地址后，就会去访问这台CDN服务器了，去请求文件资源了\r\n\r\n> 不同地区的用户会访问到离自己最近的相同网络线路上的CDN节点，当请求达到CDN节点后，节点会判断自己的内容缓存是否有效，如果有效，则立即响应缓存内容给用户，从而加快响应速度。如果CDN节点的缓存失效，它会根据服务配置去**一层一层的向上**获取最新的资源响应给用户，并将内容缓存下来以便响应给后续访问的用户，这就意味着一个地区的用户只需要访问一次服务器，后续的用户都能因此受益。\r\n\r\n**预解析DNS**。通过 DNS 预解析来告诉浏览器未来我们可能从某个特定的 URL 获取资源，当浏览器真正使用到该域中的某个资源时就可以**尽快地完成 DNS 解析**。\r\n\r\n​	通过设置X-DNS-Prefetch-Control头控制浏览器的DNS预解析功能。先在meta信息告诉浏览器开启X-DNS-Prefetch-Control，再在link里面强制对DNS进行预解析\r\n\r\n> 浏览器会对 a 标签的 href 自动启用 DNS Prefetching，所以 a 标签里包含的域名不需要在 head 中手动设置 link。但是在 HTTPS 下不起作用，需要 meta 来强制开启功能', '2022-05-12 16:43:50', 6, 0, '/upload/articleImages/5062beba5ba5f805347ff13ecc57e5c8.jpg', 1, '/upload/headerImage/f8648190c4fd95c48c278fdd30c3939b.png');
+INSERT INTO `Article` (`article_id`, `article_title`, `article_content`, `time`, `author_id`, `like`, `img`, `question_id`, `author_img`) VALUES (39, '关于两数之和-改的题解', 'indexedDB诞生背景：Cookie 的大小不超过4KB，且每次请求都会发送回服务器，LocalStorage 在 2.5MB 到 10MB 之间（各家浏览器不同），而且不提供搜索功能，不能建立自定义的索引。\r\n\r\nIndexedDB是浏览器提供的本地数据库， 允许储存大量数据，提供查找接口，还能建立索引。这些都是 LocalStorage 所不具备的。就数据库类型而言，IndexedDB 不属于关系型数据库（不支持 SQL 查询语句），更接近 NoSQL 数据库。\r\n\r\n[参考文章链接](https://segmentfault.com/a/1190000020522975)\r\n\r\n与本地存储相关的有webStorage webSql和indexedDB，后面两个都是浏览器数据库\r\n\r\n与存储数据相关的还有cookie，经常与webStorage技术来比较', '2022-05-12 19:06:46', 8, 0, NULL, 2, '/upload/headerImage/c6bbe014bc469673f1a7c5ca5fbcdf38.png');
+INSERT INTO `Article` (`article_id`, `article_title`, `article_content`, `time`, `author_id`, `like`, `img`, `question_id`, `author_img`) VALUES (41, '什么是Token', 'token的意思是“令牌”，是服务器生成的一串字符串，**作为客户端进行请求的一个标识**\r\n\r\n> 当用户第一次登录后，服务器生成了一个token并返回这个token给客户端，客户端之后只需要带上这个token前来请求数据即可，无需再带上用户名和密码\r\n>\r\n> 简单的token的组成：\r\n>\r\n> uid（用户唯一的身份标识符），time（当前时间的时间戳），sign（签名，token的前几位以哈希算法压缩成的一定长度的十六进制字符串，为防止token泄露） 存疑 不如看下面的token原理\r\n\r\n为什么要使用token？\r\n\r\n- Token是无状态、可扩展的，可以在多个服务器之间共享\r\n- Token完全由应用管理，所以它可以避开同源策略\r\n- Token可以避免CSRF攻击\r\n\r\n因为http协议是无状态的，为了区别每个用户的信息，现在一般网页用户登录使用Token机制进行区别，如果使用session辨别用户，当用户数量过大时，这是对服务器巨大的开销，而且严重限制了服务器的扩展能力。所以使用token让用户自己存储，每次请求携带，服务器通过Hash算法和密钥进行解析判断，这样服务器的资源开销减小了，也更容易进行扩展。\r\n\r\n**token原理**\r\n\r\n　　1.将荷载payload，以及Header信息进行**Base64加密**，形成payload密文，header密文。\r\n\r\n　　2.将形成的密文用句号链接起来，用服务端**秘钥**进行**HS256加密**，生成签名.\r\n\r\n　　3.将前面的两个密文后面用句号链接签名形成最终的token返回给客户端\r\n\r\n注：\r\n\r\n　　（1）用户请求时携带此token(分为三部分，header密文，payload密文，签名)到服务端，服务端解析第一部分(header密文)，用Base64解密，可以知道用了什么算法进行签名，此处解析发现是**HS256**。\r\n\r\n　　（2）服务端使用原来的秘钥与密文(header密文+\".\"+payload密文)同样进行HS256运算，然后用生成的签名与token携带的签名进行对比，若一致说明token合法，不一致说明原文被修改。\r\n\r\n　　（3）判断是否过期，客户端通过用**Base64**解密第二部分（payload密文），**可以知道荷载中授权时间，以及有效期。通过这个与当前时间对比发现token是否过期**。', '2022-05-13 12:16:43', 8, 0, '/upload/articleImages/d52b0bc94fd6efe82fe26881fd773a54.jpg', NULL, '/upload/headerImage/c6bbe014bc469673f1a7c5ca5fbcdf38.png');
+INSERT INTO `Article` (`article_id`, `article_title`, `article_content`, `time`, `author_id`, `like`, `img`, `question_id`, `author_img`) VALUES (42, 'HTML文档里head标签中有哪些常见的标签？', '每一个HTML文档中都必须有head标签，它作为一个容器，主要包含了用于描述HTML文件的自身信息（元数据）的标签。\r\n\r\n这些标签一般不会展现给用户，而是提供信息给浏览器和搜索引擎\r\n\r\n一般用到head标签里的标签有：`<title>` , `<base>` , `<link>` , `<style>` , `<meta>` , `<script>` , `<noscript>` 。这些标签也称为元信息标签\r\n\r\n\\<title>\r\n\r\n定义文档的标题，一般会显示在浏览器的标题栏或标签页上，一般会完整地概括整个网页的内容\r\n\r\n\\<base>\r\n\r\n给页面上所有相对 URL 的提供一个基础。一份文档中只能有一个 `<base>` 标签。\r\n\r\n\\<link>\r\n\r\n规定外部资源与当前文档的关系，常用于链接样式表，也有其他作用\r\n\r\n```html\r\n<!-- 引入样式 -->\r\n<link rel=\"stylesheet\" href=\"xxx.css\" type=\"text/css\" >\r\n<!-- SEO 搜索引擎优化 主要是给搜索引擎看的 在网站中常有多个 url 指向同一个页面的情况，下面的标签告知搜索引擎页面的主 url 是什么，以便搜索引擎保留主要页面而去除其他重复页面。-->\r\n<link rel=\"canonical\" href=\"...\" >\r\n<!-- 提供RSS订阅的 标签除搜索引擎可以看懂以外，也能被很多浏览器插件识别。-->\r\n<link rel=\"alternate\" type=\"application/rss+xml\" title=\"RSS\" href=\"...\">\r\n<!-- 表示页面icon的 -->\r\n<link rel=\"icon\" href=\"https://xxx.png\">\r\n<!-- 对页面进行预处理的 提前对一个域名做 dns 查询。强制对域名进行预读取在有的情况下很有用。\r\n比如, 在网站的主页上，强制在整个网站上对频繁引用的域名做预解析处理，即使它们不在主页本身上使用。虽然主页的性能可能不受影响，但是会提高站点整体性能。-->\r\n<link rel=\"dns-prefetch\" href=\"//xxx.com\">\r\n```\r\n\r\n> “SEO（Search Engine Optimization）：汉译为搜索引擎优化。是一种方式：**利用搜索引擎的规则提高网站在有关搜索引擎内的自然排名。目的是让其在行业内占据领先地位，获得品牌收益**。很大程度上是网站经营者的一种商业行为，将自己或自己公司的排名前移。”\r\n\r\n\\<style>\r\n\r\n包含了文档的样式信息\r\n\r\n\\<meta>\r\n\r\n一种通用的元数据信息表示标签，一般以键值对出现，如：`<meta name=\"xxx\" content=\"yyy\">`\r\n\r\n```html\r\n<!-- charset 属性 从 HTML5 开始，上述写法被推荐使用，用于声明当前文档所使用的字符编码，推荐放在 <head> 中的第一位。-->\r\n<meta charset=\"utf-8\">\r\n<!-- 在 HTML4 中，上述代码用于声明字符集，但是现在已不被推荐。-->\r\n<meta http-equiv=\"content-type\" content=\"text/html; charset=UTF-8\">\r\n<!-- name属性-->\r\n<meta name=\"viewport\" content=\"width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no\">\r\n其实 <meta> 标签可以被自由定义，只要读取和写入的双方约定好 name 和 content 的格式就可以了。\r\n上面这种用法并不在 HTML 标准中，但是却移动端开发的事实标准。这里来解释一下 content 中的内容：\r\n\r\nwidth ：页面宽度，可以是一个正整数；也可以一个字符串 \"device-width\" ，表示跟设备宽度相等。\r\nheight ：页面高度，可以是一个正整数；也可以一个字符串 \"device-height\" ，表示跟设备高度相等。\r\ninitial-scale ：初始缩放比例。\r\nminimum-scale ： 最小缩放比例。\r\nmaximum-scale ： 最大缩放比例。\r\nuser-scalable ：是否允许用户缩放。\r\nname 属性的值除了可以是 viewport 之外，还有相当多的值：\r\n\r\napplication-name 、author 、description 、generator 、keywords 、referrer 、robots 等。\r\n```\r\n\r\n\\<script>\r\n\r\n用于嵌入或引用可执行脚本。来看几个 script 标签常见的全局属性：\r\n\r\n- async\r\n\r\n  使浏览器使用另一个线程下载脚本，这时不会阻塞页面渲染。当脚本下载完成后，浏览器会暂停渲染，执行脚本，执行完毕后继续渲染页面。\r\n\r\n  async 无法保证脚本的执行顺序，哪个脚本先下载结束就会先执行。\r\n\r\n- defer\r\n\r\n  同样会使浏览器并行下载脚本，但是下载完毕不会立即执行，而是会等到 DOM 加载完成后（即刚刚读取完 `</html>` 标签）再执行脚本。\r\n\r\n  defer 可以保证脚本的执行顺序就是它们在页面上出现的顺序。\r\n\r\n- src\r\n\r\n  定义引用外部脚本的地址，指定此属性的 script 标签内不应再有嵌入的脚本。**如果脚本文件使用了非英语字符，还应该注明字符的编码。**如：\r\n\r\n  ```xml\r\n  <script charset=\"utf-8\" src=\"https://www.example.com/script.js\"></script>\r\n  ```\r\n\r\n- type\r\n\r\n  默认值是 text/javascript\r\n\r\n\\<noscript>\r\n\r\n如果页面上的脚本类型不受支持或者当前在浏览器中关闭了脚本，则在此中定义**脚本未被执行时的替代内容**。\r\n\r\n\r\n\r\n以上只是简单的介绍，很多相关标签都是有特殊需求，在特殊的情况下使用。', '2022-05-13 16:25:48', 8, 0, '/upload/articleImages/3b9a3e8ea7c9b876a07ae5ea8673a9b5.png', NULL, '/upload/headerImage/c6bbe014bc469673f1a7c5ca5fbcdf38.png');
+INSERT INTO `Article` (`article_id`, `article_title`, `article_content`, `time`, `author_id`, `like`, `img`, `question_id`, `author_img`) VALUES (43, '括号匹配的题解', 'DOM事件监听，其实就是“发布订阅者模式”的应用。（再去详细去了解）\r\n\r\n添加事件（回调函数）-> 触发点击，事件中心派发指定事件->执行事件。\r\n\r\n**发布订阅模式和观察者模式有什么不同？**\r\n\r\n首先，观察者是经典软件`设计模式`中的一种，但发布订阅只是软件架构中的一种`消息范式`。\r\n\r\n其次，就是实现二者所需的角色数量有着明显的区别。观察者模式本身只需要`2个`角色便可成型，即`观察者`和`被观察者`，其中`被观察者`是重点。而发布订阅需要至少`3个`角色来组成，包括`发布者`、`订阅者`和`发布订阅中心`，其中`发布订阅中心`是重点。\r\n\r\n详细介绍：[理解【观察者模式】和【发布订阅】的区别](https://juejin.cn/post/6978728619782701087)', '2022-05-13 16:39:35', 8, 0, NULL, 3, '/upload/headerImage/c6bbe014bc469673f1a7c5ca5fbcdf38.png');
 COMMIT;
 
 -- ----------------------------
@@ -60,7 +65,7 @@ CREATE TABLE `Comment` (
   `reply_name` varchar(20) DEFAULT NULL,
   `head_img` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`comment_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=29 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=35 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of Comment
@@ -93,6 +98,12 @@ INSERT INTO `Comment` (`comment_id`, `article_id`, `time`, `uuid`, `user_name`, 
 INSERT INTO `Comment` (`comment_id`, `article_id`, `time`, `uuid`, `user_name`, `content`, `reply_id`, `reply_name`, `head_img`) VALUES (26, 31, '2022-05-08 10:38:12', 6, 'TojoNozomi', '1\n', 25, 'TojoNozomi', '/upload/headerImage/f8648190c4fd95c48c278fdd30c3939b.png');
 INSERT INTO `Comment` (`comment_id`, `article_id`, `time`, `uuid`, `user_name`, `content`, `reply_id`, `reply_name`, `head_img`) VALUES (27, 31, '2022-05-08 10:38:18', 6, 'TojoNozomi', '223', 26, 'TojoNozomi', '/upload/headerImage/f8648190c4fd95c48c278fdd30c3939b.png');
 INSERT INTO `Comment` (`comment_id`, `article_id`, `time`, `uuid`, `user_name`, `content`, `reply_id`, `reply_name`, `head_img`) VALUES (28, 35, '2022-05-08 13:06:20', 6, 'TojoNozomi', '博主分析的真好', 0, '', '/upload/headerImage/f8648190c4fd95c48c278fdd30c3939b.png');
+INSERT INTO `Comment` (`comment_id`, `article_id`, `time`, `uuid`, `user_name`, `content`, `reply_id`, `reply_name`, `head_img`) VALUES (29, 36, '2022-05-10 17:00:13', 8, 'K-on', '发表一个评论吧', 0, '', '/upload/headerImage/c6bbe014bc469673f1a7c5ca5fbcdf38.png');
+INSERT INTO `Comment` (`comment_id`, `article_id`, `time`, `uuid`, `user_name`, `content`, `reply_id`, `reply_name`, `head_img`) VALUES (30, 36, '2022-05-10 17:00:27', 8, 'K-on', '发表第二个评论', 0, '', '/upload/headerImage/c6bbe014bc469673f1a7c5ca5fbcdf38.png');
+INSERT INTO `Comment` (`comment_id`, `article_id`, `time`, `uuid`, `user_name`, `content`, `reply_id`, `reply_name`, `head_img`) VALUES (31, 36, '2022-05-10 17:00:33', 8, 'K-on', '回复第一个评论', 29, 'K-on', '/upload/headerImage/c6bbe014bc469673f1a7c5ca5fbcdf38.png');
+INSERT INTO `Comment` (`comment_id`, `article_id`, `time`, `uuid`, `user_name`, `content`, `reply_id`, `reply_name`, `head_img`) VALUES (32, 36, '2022-05-10 17:00:46', 8, 'K-on', '回复这个回复评论', 31, 'K-on', '/upload/headerImage/c6bbe014bc469673f1a7c5ca5fbcdf38.png');
+INSERT INTO `Comment` (`comment_id`, `article_id`, `time`, `uuid`, `user_name`, `content`, `reply_id`, `reply_name`, `head_img`) VALUES (33, 42, '2022-05-13 16:26:55', 8, 'K-on', '发表一条评论', 0, '', '/upload/headerImage/c6bbe014bc469673f1a7c5ca5fbcdf38.png');
+INSERT INTO `Comment` (`comment_id`, `article_id`, `time`, `uuid`, `user_name`, `content`, `reply_id`, `reply_name`, `head_img`) VALUES (34, 42, '2022-05-13 16:27:02', 8, 'K-on', '回复这条评论', 33, 'K-on', '/upload/headerImage/c6bbe014bc469673f1a7c5ca5fbcdf38.png');
 COMMIT;
 
 -- ----------------------------
@@ -109,6 +120,14 @@ CREATE TABLE `Daily_Question` (
 -- Records of Daily_Question
 -- ----------------------------
 BEGIN;
+INSERT INTO `Daily_Question` (`date`, `question_id`) VALUES ('2022-05-06 17:39:31', 1);
+INSERT INTO `Daily_Question` (`date`, `question_id`) VALUES ('2022-05-07 17:39:31', 9);
+INSERT INTO `Daily_Question` (`date`, `question_id`) VALUES ('2022-05-08 17:39:31', 7);
+INSERT INTO `Daily_Question` (`date`, `question_id`) VALUES ('2022-05-09 17:39:31', 2);
+INSERT INTO `Daily_Question` (`date`, `question_id`) VALUES ('2022-05-10 17:39:31', 3);
+INSERT INTO `Daily_Question` (`date`, `question_id`) VALUES ('2022-05-11 16:28:59', 8);
+INSERT INTO `Daily_Question` (`date`, `question_id`) VALUES ('2022-05-12 16:00:00', 4);
+INSERT INTO `Daily_Question` (`date`, `question_id`) VALUES ('2022-05-13 16:02:37', 5);
 COMMIT;
 
 -- ----------------------------
@@ -179,7 +198,7 @@ CREATE TABLE `Tags` (
   `tags_id` int NOT NULL AUTO_INCREMENT,
   `tags_name` varchar(20) DEFAULT NULL,
   PRIMARY KEY (`tags_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=21 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=28 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
 -- Records of Tags
@@ -197,6 +216,13 @@ INSERT INTO `Tags` (`tags_id`, `tags_name`) VALUES (17, '面试常问');
 INSERT INTO `Tags` (`tags_id`, `tags_name`) VALUES (18, 'Typescript');
 INSERT INTO `Tags` (`tags_id`, `tags_name`) VALUES (19, '测试');
 INSERT INTO `Tags` (`tags_id`, `tags_name`) VALUES (20, '编程语言');
+INSERT INTO `Tags` (`tags_id`, `tags_name`) VALUES (21, '两数之和题解');
+INSERT INTO `Tags` (`tags_id`, `tags_name`) VALUES (22, '算法');
+INSERT INTO `Tags` (`tags_id`, `tags_name`) VALUES (23, '题解');
+INSERT INTO `Tags` (`tags_id`, `tags_name`) VALUES (24, '服务器');
+INSERT INTO `Tags` (`tags_id`, `tags_name`) VALUES (25, 'Token');
+INSERT INTO `Tags` (`tags_id`, `tags_name`) VALUES (26, 'HTML');
+INSERT INTO `Tags` (`tags_id`, `tags_name`) VALUES (27, '括号匹配');
 COMMIT;
 
 -- ----------------------------
@@ -206,7 +232,8 @@ DROP TABLE IF EXISTS `Tags_Article`;
 CREATE TABLE `Tags_Article` (
   `tags_id` int NOT NULL,
   `article_id` int NOT NULL,
-  PRIMARY KEY (`tags_id`,`article_id`) USING BTREE
+  PRIMARY KEY (`tags_id`,`article_id`) USING BTREE,
+  KEY `article_id` (`article_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
@@ -214,15 +241,22 @@ CREATE TABLE `Tags_Article` (
 -- ----------------------------
 BEGIN;
 INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (8, 31);
-INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (8, 32);
 INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (9, 31);
 INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (11, 31);
+INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (8, 32);
 INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (13, 32);
 INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (14, 32);
 INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (15, 35);
 INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (17, 35);
 INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (19, 36);
 INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (20, 37);
+INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (21, 38);
+INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (22, 38);
+INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (23, 39);
+INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (24, 41);
+INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (25, 41);
+INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (26, 42);
+INSERT INTO `Tags_Article` (`tags_id`, `article_id`) VALUES (27, 43);
 COMMIT;
 
 -- ----------------------------
@@ -248,7 +282,7 @@ CREATE TABLE `User` (
 BEGIN;
 INSERT INTO `User` (`uuid`, `user_name`, `password`, `email`, `age`, `sex`, `city`, `introduction`, `head_img`) VALUES (1, '落雪如衣', '6031332lzy', '834159744@qq.com', 18, 1, '浙江/杭州', '这个人很懒，什么都没写', 'HeadImg/unLoginImg.png');
 INSERT INTO `User` (`uuid`, `user_name`, `password`, `email`, `age`, `sex`, `city`, `introduction`, `head_img`) VALUES (6, 'TojoNozomi', '1058013df6c7b51200ae5b27e6fec4b5', '2930096618@qq.com', 18, 1, '上海/宝山', '东条希', '/upload/headerImage/f8648190c4fd95c48c278fdd30c3939b.png');
-INSERT INTO `User` (`uuid`, `user_name`, `password`, `email`, `age`, `sex`, `city`, `introduction`, `head_img`) VALUES (8, 'K-on', 'aa1be3665ad565a808e4f2f5cb63b905', '13508085664@163.com', 18, 1, '浙江/杭州', 'fuwafuwa time!', '/upload/headerImage/c6bbe014bc469673f1a7c5ca5fbcdf38.png');
+INSERT INTO `User` (`uuid`, `user_name`, `password`, `email`, `age`, `sex`, `city`, `introduction`, `head_img`) VALUES (8, 'K-on', 'aa1be3665ad565a808e4f2f5cb63b905', '13508085664@163.com', 18, 1, '浙江/杭州', '这个人很懒，什么都没写下', '/upload/headerImage/c6bbe014bc469673f1a7c5ca5fbcdf38.png');
 INSERT INTO `User` (`uuid`, `user_name`, `password`, `email`, `age`, `sex`, `city`, `introduction`, `head_img`) VALUES (9, 'look', '3ec5b787b56586f771efecef91df34fb', '1336354338@qq.com', 18, 1, '浙江/杭州', '这个人很懒，什么都没写', '/default/unLoginImg.png');
 COMMIT;
 
@@ -259,7 +293,8 @@ DROP TABLE IF EXISTS `UserArticle_Likes`;
 CREATE TABLE `UserArticle_Likes` (
   `article_id` int NOT NULL,
   `uuid` int NOT NULL,
-  PRIMARY KEY (`uuid`,`article_id`)
+  PRIMARY KEY (`uuid`,`article_id`),
+  KEY `article_id` (`article_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
 -- ----------------------------
@@ -267,8 +302,11 @@ CREATE TABLE `UserArticle_Likes` (
 -- ----------------------------
 BEGIN;
 INSERT INTO `UserArticle_Likes` (`article_id`, `uuid`) VALUES (31, 6);
+INSERT INTO `UserArticle_Likes` (`article_id`, `uuid`) VALUES (31, 8);
 INSERT INTO `UserArticle_Likes` (`article_id`, `uuid`) VALUES (32, 6);
 INSERT INTO `UserArticle_Likes` (`article_id`, `uuid`) VALUES (35, 6);
+INSERT INTO `UserArticle_Likes` (`article_id`, `uuid`) VALUES (36, 8);
+INSERT INTO `UserArticle_Likes` (`article_id`, `uuid`) VALUES (37, 8);
 COMMIT;
 
 -- ----------------------------
@@ -290,7 +328,127 @@ CREATE TABLE `User_Question` (
 -- Records of User_Question
 -- ----------------------------
 BEGIN;
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-03-21 18:39:14', '123', 'JavaScript', '1112');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-03-29 18:39:14', '142', 'C++', '1113');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-03-30 18:40:14', '70', 'JavaScript', '1115');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-03-30 18:41:14', '270', 'JavaScript', '1116');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-03-30 18:39:14', '270', 'C', '114');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-04-30 18:39:14', '270', 'C', '123143');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-03-15 18:41:14', '270', 'JavaScript', '123q1we');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-03-15 18:41:14', '270', 'JavaScript', '123qwe');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-03-11 18:39:14', '270', 'JavaScript', '13123213');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-05-11 18:39:14', '279', 'Java', '1ff5403835b955a70c3ed472d216433c');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-03-12 18:39:14', '0', 'JavaScript', '2222');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-04-09 18:39:14', '270', 'JavaScript', '22221');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-04-12 18:39:14', '0', 'JavaScript', '22223');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-04-12 18:40:14', '270', 'Java', '22224');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-04-12 18:39:14', '274', 'C', '22225');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 5, 0, '2022-04-20 18:39:14', '0', 'JavaScript', '22226');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-04-21 18:29:14', '0', 'JavaScript', '22228');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-04-21 18:39:14', '100', 'Python3', '2227');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-04-21 18:30:14', '0', 'JavaScript', '2229');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-05-10 14:29:37', '323', 'Java', '247fa24891ae17e43dab21a0bcc53297');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-04-21 18:31:14', '90', 'JavaScript', '3000');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-04-21 18:39:14', '123', 'JavaScript', '3331');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-04-29 18:39:14', '142', 'C++', '3332');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-03-12 18:40:14', '270', 'Java', '3333');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (6, 6, 0, '2022-05-12 16:09:22', '56', 'JavaScript', '3ce8d25cb6e588df46e118b837a9a2ca');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 0, '2022-05-10 16:40:37', '0', 'JavaScript', '3d485013978bf08a30edc5d3b7ba3c6f');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-03-12 18:39:14', '274', 'C', '4444');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-04-30 18:40:14', '70', 'JavaScript', '444444');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 0, '2022-05-10 16:40:35', '0', 'JavaScript', '47f2be54b8169dbe36df71845819e1c6');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-04-30 18:41:14', '270', 'JavaScript', '55555555');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-05-13 16:21:22', '77', 'JavaScript', '5556df0a1dc83d128645ee2e27893ed1');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 3, 1, '2022-05-11 17:41:05', '75', 'JavaScript', '55a92b9a7b10b2508d8381c093083eb4');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 9, 0, '2022-05-11 18:32:44', '79', 'JavaScript', '573dcaa2e089b9fc98e7c1d326d4f004');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 0, '2022-05-13 16:08:50', '66', 'JavaScript', '5ae53f07bb50f3ed9decb87c3d8dc763');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 9, 0, '2022-05-11 18:33:24', '76', 'JavaScript', '60902fd51bde11bbee7a06f0f6f9e1d5');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 5, 0, '2022-03-20 18:39:14', '0', 'JavaScript', '65555');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-03-21 18:39:14', '100', 'Python3', '66666');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (6, 2, 0, '2022-05-11 18:42:30', '88', 'JavaScript', '6997ae62ba0efaf476c7f04bd695d1c3');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 9, 0, '2022-05-11 18:34:07', '75', 'JavaScript', '6b3eaf664376f777e5310ab15bc84898');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-05-11 18:28:34', '0', 'Java', '6d04f4aa3d43c280507109dd2f7193bb');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-03-21 18:29:14', '0', 'JavaScript', '77777');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-05-12 18:56:31', '49', 'JavaScript', '7e21a4b2b323aaddc3c05f66c6849860');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-03-21 18:30:14', '0', 'JavaScript', '88888');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 9, 0, '2022-05-11 18:32:56', '0', 'C', '954a36c9599680891d886e7ac873964e');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-03-21 18:31:14', '90', 'JavaScript', '99999');
 INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 0, '2022-05-10 14:26:59', '0', 'JavaScript', '9b8fb3793e6aaa24b701c4abf0525987');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 3, 0, '2022-05-11 17:40:47', '0', 'JavaScript', '9d30608c609387776eb0930b56662ba2');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 3, 1, '2022-05-13 16:46:21', '91', 'JavaScript', 'a0a0cf3c2b13da272c11653fe99726c5');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (6, 7, 1, '2022-05-11 18:42:50', '73', 'JavaScript', 'a20e9c4659afecbebc226165f2e11e27');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 9, 1, '2022-05-11 18:38:27', '65', 'JavaScript', 'a26af216efdda37c206caae2890724f5');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-05-11 18:29:38', '0', 'Java', 'ad278b833c11c627ce95404dfa7dcd7c');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 3, 0, '2022-05-11 17:34:20', '0', 'JavaScript', 'ad5f754f69d5d2d447d580a6dd9356ef');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-05-13 16:21:50', '313', 'Java', 'b4eddeb88525d6ceda9f6c06d897fa2a');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 8, 0, '2022-05-11 16:50:23', '0', 'JavaScript', 'b6e56ea52bd627112acd3df57057672b');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-04-24 18:39:14', '142', 'C++', 'bbbb7b');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-04-24 18:39:14', '142', 'C++', 'bbbbb');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 9, 0, '2022-05-11 18:32:50', '0', 'Python3', 'bcc7d8ef46dc32da0793da298dd65515');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-05-10 16:41:15', '340', 'Java', 'c314f5c489ce1fb577e06b82853a3772');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 9, 0, '2022-05-11 18:33:01', '0', 'C++', 'c696014e8fd9dfb4255f090bb220030c');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 0, '2022-05-13 16:10:51', '0', 'Java', 'cafd3b3897ec965af34cfa95ff83cd67');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-04-24 18:31:14', '90', 'JavaScript', 'cccc5c');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-04-24 18:31:14', '90', 'JavaScript', 'ccccc');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 0, '2022-05-11 18:39:08', '0', 'Java', 'd337e916bc9699eb5e6a39f74cba22b7');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-05-11 17:27:36', '54', 'JavaScript', 'dd6bf153265c6125d805807717009b5f');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-05-11 01:16:25', '329', 'Java', 'de3694012bb0abfffd83039b296bec3d');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (6, 6, 0, '2022-05-12 16:08:45', '53', 'JavaScript', 'e58efc0cfd3d815f7ff406ac067b3715');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-05-11 18:26:22', '0', 'JavaScript', 'ea7acb452cc87e2a0d6f7db0f149b957');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 3, 1, '2022-05-11 17:34:12', '67', 'JavaScript', 'ec71719936df2859edc044e1d470d2c1');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (6, 1, 1, '2022-05-12 16:29:36', '90', 'JavaScript', 'ee7e0510d2d79f95fa622e706821d22e');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-02-12 18:40:14', '270', 'Java', 'eeee');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-02-01 18:40:14', '270', 'Java', 'eeee3');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-01-30 18:40:14', '70', 'JavaScript', 'eeeee');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-01-14 18:40:14', '70', 'JavaScript', 'eeeee4');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (6, 6, 0, '2022-05-12 16:06:39', '97', 'JavaScript', 'f47db8513051cc58c12822aec61c5e71');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (6, 6, 0, '2022-05-12 16:21:36', '78', 'JavaScript', 'ffdd39785e4fafdaac5859bef889bbf2');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-04-01 18:39:14', '270', 'JavaScript', 'fffff');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-04-01 18:39:14', '270', 'JavaScript', 'fffff6');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-04-02 18:39:14', '0', 'JavaScript', 'ggggg');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-04-02 18:39:14', '0', 'JavaScript', 'ggggg7');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-04-01 18:40:14', '270', 'Java', 'hhhhh');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-04-01 18:40:14', '270', 'Java', 'hhhhh8');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-02-21 18:30:14', '0', 'JavaScript', 'iiiii');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-02-14 18:30:14', '0', 'JavaScript', 'iiiii8');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-04-02 18:39:14', '274', 'C', 'jjjjj');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-04-02 18:39:14', '274', 'C', 'jjjjj9');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 5, 0, '2022-04-02 18:39:14', '0', 'JavaScript', 'kkkkk');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 5, 0, '2022-04-02 18:39:14', '0', 'JavaScript', 'kkkkk1');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-04-07 18:39:14', '100', 'Python3', 'lllll');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-04-07 18:39:14', '100', 'Python3', 'lllll2');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-03-15 18:40:14', '70', 'JavaScript', 'mmm9mmm');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-03-15 18:40:14', '70', 'JavaScript', 'mmmmmm');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-04-10 18:39:14', '270', 'C', 'nnn8nn');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-04-10 18:39:14', '270', 'C', 'nnnnn');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-02-21 18:31:14', '90', 'JavaScript', 'oooo');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-02-14 18:31:14', '90', 'JavaScript', 'oooo9');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-02-21 18:39:14', '123', 'JavaScript', 'pppp');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-02-14 18:39:14', '123', 'JavaScript', 'pppp1');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-01-29 18:39:14', '142', 'C++', 'qqqqq');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-02-11 18:39:14', '270', 'JavaScript', 'qqqqq');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-02-01 18:39:14', '270', 'JavaScript', 'qqqqq1');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-01-14 18:39:14', '142', 'C++', 'qqqqq2');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-01-30 18:41:14', '270', 'JavaScript', 'rrrrr');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-02-12 18:39:14', '274', 'C', 'rrrrr');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 1, '2022-02-01 18:39:14', '274', 'C', 'rrrrr4');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-01-14 18:41:14', '270', 'JavaScript', 'rrrrr5');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 5, 0, '2022-02-20 18:39:14', '0', 'JavaScript', 'ttttt');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 5, 0, '2022-02-01 18:39:14', '0', 'JavaScript', 'ttttt5');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-02-21 18:29:14', '0', 'JavaScript', 'uuuu');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-02-01 18:29:14', '0', 'JavaScript', 'uuuu7');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-04-24 18:39:14', '123', 'JavaScript', 'vvvvv');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 1, 1, '2022-04-24 18:39:14', '123', 'JavaScript', 'vvvvv6');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-01-30 18:39:14', '270', 'C', 'wwww');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-01-14 18:39:14', '270', 'C', 'wwww3');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-02-12 18:39:14', '0', 'JavaScript', 'wwwww');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-02-01 18:39:14', '0', 'JavaScript', 'wwwww2');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-04-24 18:30:14', '0', 'JavaScript', 'xxxxx');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-04-24 18:30:14', '0', 'JavaScript', 'xxxxx4');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-02-21 18:39:14', '100', 'Python3', 'yyyyy');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 2, 1, '2022-02-01 18:39:14', '100', 'Python3', 'yyyyy6');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-04-03 18:29:14', '0', 'JavaScript', 'zzzz');
+INSERT INTO `User_Question` (`uuid`, `question_id`, `state`, `date`, `time`, `language`, `submission_id`) VALUES (8, 4, 0, '2022-04-03 18:29:14', '0', 'JavaScript', 'zzzz3');
 COMMIT;
 
 SET FOREIGN_KEY_CHECKS = 1;
